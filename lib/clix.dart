@@ -67,6 +67,8 @@ export 'src/core/style/color.dart';
 export 'src/core/style/theme.dart';
 export 'src/core/style/point_style.dart';
 export 'src/core/style/padding.dart';
+export 'src/core/style/spacing.dart';
+export 'src/core/style/hint_symbol.dart';
 export 'src/core/style/line_spacing.dart';
 
 /// ### **Icons & Visual Elements**

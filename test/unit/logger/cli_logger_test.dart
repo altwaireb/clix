@@ -9,6 +9,8 @@ import 'package:clix/src/core/indentation/tree_symbol.dart';
 import 'package:clix/src/core/style/point_style.dart';
 import 'package:clix/src/core/style/color.dart';
 import 'package:clix/src/core/style/padding.dart';
+import 'package:clix/src/core/style/spacing.dart';
+import 'package:clix/src/core/style/hint_symbol.dart';
 import 'package:clix/src/core/style/line_spacing.dart';
 import '../../helpers/mock_io.dart';
 import '../../helpers/test_utils.dart';
@@ -540,6 +542,334 @@ void main() {
 
         expect(mockIO.outputs, hasLength(1));
         expect(mockIO.outputs.first, contains('Maroon background'));
+      });
+    });
+
+    group('Message with Hint Methods', () {
+      test('should log message with hint using default values', () {
+        logger.messageWithHint('Build completed', hint: 'Run tests next');
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('Build completed'));
+        expect(mockIO.outputs.first, contains('Run tests next'));
+        expect(mockIO.outputs.first, contains('•')); // default dot symbol
+      });
+
+      test('should log message with hint using custom spacing', () {
+        logger.messageWithHint(
+          'Build completed',
+          hint: 'Run tests next',
+          spacing: Spacing.large,
+        );
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('Build completed'));
+        expect(mockIO.outputs.first, contains('Run tests next'));
+      });
+
+      test('should log message with hint using custom symbol', () {
+        logger.messageWithHint(
+          'Build completed',
+          hint: 'Run tests next',
+          hintSymbol: HintSymbol.arrow,
+        );
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('Build completed'));
+        expect(mockIO.outputs.first, contains('Run tests next'));
+        expect(mockIO.outputs.first, contains('→')); // arrow symbol
+      });
+
+      test('should log message with hint using custom colors', () {
+        logger.messageWithHint(
+          'Build completed',
+          hint: 'Run tests next',
+          color: CliColor.success,
+          hintColor: CliColor.darkGray,
+        );
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('Build completed'));
+        expect(mockIO.outputs.first, contains('Run tests next'));
+      });
+
+      test('should log message without hint when hint is empty', () {
+        logger.messageWithHint('Simple message');
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('Simple message'));
+        expect(mockIO.outputs.first.contains('•'), isFalse);
+      });
+
+      test('should log message with indent', () {
+        logger.messageWithHint(
+          'Indented message',
+          hint: 'With hint',
+          indent: IndentLevel.level1,
+        );
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('Indented message'));
+        expect(mockIO.outputs.first, contains('With hint'));
+      });
+    });
+
+    group('Message with Icon and Hint Methods', () {
+      test('should log message with icon and hint using default values', () {
+        logger.messageIconWithHint(
+          'Operation completed',
+          hint: 'Check logs for details',
+          icon: CliIcons.success,
+        );
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('Operation completed'));
+        expect(mockIO.outputs.first, contains('Check logs for details'));
+        expect(mockIO.outputs.first, contains('✅')); // success icon
+        expect(mockIO.outputs.first, contains('•')); // default dot symbol
+      });
+
+      test('should log message with icon and hint using custom spacing', () {
+        logger.messageIconWithHint(
+          'Process finished',
+          hint: 'Next: review output',
+          icon: CliIcons.rocket,
+          spacing: Spacing.extraLarge,
+        );
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('Process finished'));
+        expect(mockIO.outputs.first, contains('Next: review output'));
+        expect(mockIO.outputs.first, contains('🚀')); // rocket icon
+      });
+
+      test('should log message with icon and hint using custom symbol', () {
+        logger.messageIconWithHint(
+          'Task complete',
+          hint: 'Move to next phase',
+          icon: CliIcons.check,
+          hintSymbol: HintSymbol.lightBulb,
+        );
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('Task complete'));
+        expect(mockIO.outputs.first, contains('Move to next phase'));
+        expect(mockIO.outputs.first, contains('💡')); // lightbulb symbol
+      });
+
+      test('should log message with icon without hint when hint is empty', () {
+        logger.messageIconWithHint('Icon only message', icon: CliIcons.info);
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('Icon only message'));
+        expect(mockIO.outputs.first, contains('ℹ️')); // info icon
+        expect(mockIO.outputs.first.contains('•'), isFalse);
+      });
+    });
+
+    group('Specialized Hint Methods', () {
+      group('Success with Hint', () {
+        test('should log success message with hint', () {
+          logger.successWithHint(
+            'Build successful',
+            hint: 'Run deployment script',
+          );
+
+          expect(mockIO.outputs, hasLength(1));
+          expect(mockIO.outputs.first, contains('Build successful'));
+          expect(mockIO.outputs.first, contains('Run deployment script'));
+        });
+
+        test('should log success icon message with hint', () {
+          logger.successIconWithHint('Tests passed', hint: 'Coverage: 98%');
+
+          expect(mockIO.outputs, hasLength(1));
+          expect(mockIO.outputs.first, contains('Tests passed'));
+          expect(mockIO.outputs.first, contains('Coverage: 98%'));
+          expect(mockIO.outputs.first, contains('✅')); // success icon
+        });
+      });
+
+      group('Error with Hint', () {
+        test('should log error message with hint', () {
+          logger.errorWithHint(
+            'Connection failed',
+            hint: 'Check network settings',
+          );
+
+          expect(mockIO.outputs, hasLength(1));
+          expect(mockIO.outputs.first, contains('Connection failed'));
+          expect(mockIO.outputs.first, contains('Check network settings'));
+        });
+
+        test('should log error icon message with hint', () {
+          logger.errorIconWithHint(
+            'Build failed',
+            hint: 'Run with --verbose for details',
+          );
+
+          expect(mockIO.outputs, hasLength(1));
+          expect(mockIO.outputs.first, contains('Build failed'));
+          expect(
+            mockIO.outputs.first,
+            contains('Run with --verbose for details'),
+          );
+          expect(mockIO.outputs.first, contains('❌')); // error icon
+        });
+      });
+
+      group('Warning with Hint', () {
+        test('should log warning message with hint', () {
+          logger.warnWithHint('Deprecated API used', hint: 'Migrate to v2 API');
+
+          expect(mockIO.outputs, hasLength(1));
+          expect(mockIO.outputs.first, contains('Deprecated API used'));
+          expect(mockIO.outputs.first, contains('Migrate to v2 API'));
+        });
+
+        test('should log warning icon message with hint', () {
+          logger.warnIconWithHint(
+            'Memory usage high',
+            hint: 'Consider optimizing allocations',
+          );
+
+          expect(mockIO.outputs, hasLength(1));
+          expect(mockIO.outputs.first, contains('Memory usage high'));
+          expect(
+            mockIO.outputs.first,
+            contains('Consider optimizing allocations'),
+          );
+          expect(mockIO.outputs.first, contains('⚠️')); // warning icon
+        });
+      });
+
+      group('Info with Hint', () {
+        test('should log info message with hint', () {
+          logger.infoWithHint('Server started', hint: 'Listening on port 3000');
+
+          expect(mockIO.outputs, hasLength(1));
+          expect(mockIO.outputs.first, contains('Server started'));
+          expect(mockIO.outputs.first, contains('Listening on port 3000'));
+        });
+
+        test('should log info icon message with hint', () {
+          logger.infoIconWithHint(
+            'Configuration loaded',
+            hint: 'Edit config.yaml to customize',
+          );
+
+          expect(mockIO.outputs, hasLength(1));
+          expect(mockIO.outputs.first, contains('Configuration loaded'));
+          expect(
+            mockIO.outputs.first,
+            contains('Edit config.yaml to customize'),
+          );
+          expect(mockIO.outputs.first, contains('ℹ️')); // info icon
+        });
+      });
+    });
+
+    group('Color-Specific Hint Methods', () {
+      test('should log primary message with hint', () {
+        logger.primaryWithHint(
+          'Welcome to application',
+          hint: 'Type help for commands',
+        );
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('Welcome to application'));
+        expect(mockIO.outputs.first, contains('Type help for commands'));
+      });
+
+      test('should log secondary message with hint', () {
+        logger.secondaryWithHint(
+          'Optional features available',
+          hint: 'Run app features to see options',
+        );
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('Optional features available'));
+        expect(
+          mockIO.outputs.first,
+          contains('Run app features to see options'),
+        );
+      });
+
+      test('should log white message with hint', () {
+        logger.whiteWithHint('System ready', hint: 'All services operational');
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('System ready'));
+        expect(mockIO.outputs.first, contains('All services operational'));
+      });
+
+      test('should log color-specific messages without hints', () {
+        logger.primaryWithHint('Primary message only');
+        logger.secondaryWithHint('Secondary message only');
+        logger.whiteWithHint('White message only');
+
+        expect(mockIO.outputs, hasLength(3));
+        expect(mockIO.outputs[0], contains('Primary message only'));
+        expect(mockIO.outputs[1], contains('Secondary message only'));
+        expect(mockIO.outputs[2], contains('White message only'));
+      });
+    });
+
+    group('Hint Symbol Tests', () {
+      test('should work with all hint symbols', () {
+        final symbols = [
+          HintSymbol.none,
+          HintSymbol.dot,
+          HintSymbol.arrow,
+          HintSymbol.dash,
+          HintSymbol.pipe,
+          HintSymbol.chevron,
+          HintSymbol.diamond,
+          HintSymbol.triangle,
+          HintSymbol.doubleArrow,
+          HintSymbol.star,
+          HintSymbol.info,
+          HintSymbol.lightBulb,
+        ];
+
+        for (final symbol in symbols) {
+          TestUtils.resetMockIO(mockIO);
+          logger.messageWithHint(
+            'Test message',
+            hint: 'Test hint',
+            hintSymbol: symbol,
+          );
+
+          expect(mockIO.outputs, hasLength(1));
+          expect(mockIO.outputs.first, contains('Test message'));
+          expect(mockIO.outputs.first, contains('Test hint'));
+        }
+      });
+    });
+
+    group('Spacing Tests', () {
+      test('should work with all spacing levels', () {
+        final spacings = [
+          Spacing.none,
+          Spacing.small,
+          Spacing.medium,
+          Spacing.large,
+          Spacing.extraLarge,
+          Spacing.huge,
+        ];
+
+        for (final spacing in spacings) {
+          TestUtils.resetMockIO(mockIO);
+          logger.messageWithHint(
+            'Test message',
+            hint: 'Test hint',
+            spacing: spacing,
+          );
+
+          expect(mockIO.outputs, hasLength(1));
+          expect(mockIO.outputs.first, contains('Test message'));
+          expect(mockIO.outputs.first, contains('Test hint'));
+        }
       });
     });
   });

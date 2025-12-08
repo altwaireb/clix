@@ -20,6 +20,7 @@
 - **🎯 Unified Solution** - All CLI tools in one package, no multiple dependencies needed
 - **💪 Type Safe** - Full Dart null safety with comprehensive type support  
 - **🧪 Testing Ready** - Built-in mock I/O for easy testing, unlike manual setup alternatives
+- **🛡️ Production Ready** - Clix is fully tested with more than 460 automated tests, ensuring stability, predictable behavior, and production-ready performance
 - **✅ Rich Validation** - Flexible validator system for all input types
 - **⚡ Modern API** - Clean `.interact()` syntax throughout, not verbose method calls
 - **🔢 Smart Numbers** ⭐ - Dedicated `Number` and `Decimal` prompts with range validation
@@ -234,6 +235,12 @@ final logger = CliLogger.defaults();
 logger.info('App started');
 logger.successIcon('Task completed successfully');
 logger.onSuccess('Operation finished', padding: Padding.medium);
+
+// Messages with helpful hints
+logger.successWithHint('Build completed', hint: 'Run tests with: dart test');
+logger.errorWithHint('Connection failed', hint: 'Check network settings');
+logger.primaryWithHint('Welcome!', hint: 'Type help for commands', 
+  spacing: Spacing.large, hintSymbol: HintSymbol.lightBulb);
 ```
 
 ### Setup
@@ -260,6 +267,64 @@ logger.onSuccess('Operation finished', padding: Padding.medium);
 - `white()` - White text
 - `primary()` - Primary theme color
 - `secondary()` - Secondary theme color
+
+### Messages with Hints ⭐
+
+Display messages with additional guidance and context using customizable spacing and symbols:
+
+```dart
+// Basic usage with default gray hints
+logger.successWithHint('Build completed', hint: 'Run tests next');
+logger.errorWithHint('Connection failed', hint: 'Check network settings');
+
+// With custom spacing and symbols
+logger.primaryWithHint(
+  'Welcome to App',
+  hint: 'Type help for commands',
+  spacing: Spacing.large,
+  hintSymbol: HintSymbol.lightBulb,
+);
+```
+
+#### Core Hint Methods
+
+- `messageWithHint()` - Custom message with hint
+- `messageIconWithHint()` - Custom message with icon and hint
+
+#### Level-Based Hint Methods
+
+- `successWithHint()` - Success message with guidance
+- `successIconWithHint()` - Success with ✅ icon and hint
+- `errorWithHint()` - Error message with troubleshooting
+- `errorIconWithHint()` - Error with ❌ icon and hint
+- `warnWithHint()` - Warning with recommendations  
+- `warnIconWithHint()` - Warning with ⚠️ icon and hint
+- `infoWithHint()` - Information with context
+- `infoIconWithHint()` - Info with ℹ️ icon and hint
+
+#### Color-Specific Hint Methods
+
+- `primaryWithHint()` - Primary color message with hint
+- `secondaryWithHint()` - Secondary color message with hint
+- `whiteWithHint()` - White color message with hint
+
+#### Hint Symbols
+
+- `HintSymbol.dot` (•) - Clean and minimal
+- `HintSymbol.arrow` (→) - Next action indicator
+- `HintSymbol.lightBulb` (💡) - Tips and suggestions
+- `HintSymbol.star` (★) - Important highlights
+- `HintSymbol.info` (ℹ) - Informational hints
+- Plus 7 more symbols: `dash`, `pipe`, `chevron`, `diamond`, `triangle`, `doubleArrow`, `none`
+
+#### Spacing Levels
+
+- `Spacing.none` - No spacing (0)
+- `Spacing.small` - 2 spaces between message and hint
+- `Spacing.medium` - 4 spaces (default)
+- `Spacing.large` - 6 spaces
+- `Spacing.extraLarge` - 8 spaces
+- `Spacing.huge` - 10 spaces
 
 ### Background Colors
 
@@ -433,11 +498,16 @@ void main() async {
       spinner.complete('Project created! 🎉');
       
       logger.newLine();
-      logger.success('Project: $projectName');
-      logger.info('Framework: $framework');
-      logger.info('Features: ${features.join(', ')}');
+      logger.successWithHint('Project: $projectName', 
+        hint: 'Navigate with: cd $projectName');
+      logger.infoWithHint('Framework: $framework', 
+        hint: 'Run with: dart run');
+      logger.primaryWithHint('Features: ${features.join(', ')}', 
+        hint: 'Configure in pubspec.yaml', 
+        spacing: Spacing.large);
     } else {
-      logger.warn('Setup cancelled');
+      logger.warnWithHint('Setup cancelled', 
+        hint: 'Run again anytime to restart setup');
     }
     
   } catch (e) {
