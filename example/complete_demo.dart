@@ -1,6 +1,10 @@
 import 'package:clix/clix.dart';
 
 Future<void> main() async {
+  // Create logger - you can use either:
+  // final logger = CliLogger.defaults(); // Quick setup with default settings
+  // final logger = CliLogger();          // Basic constructor with customizable options
+  // final logger = CliLogger(showTimestamps: true, minimumLevel: LogLevel.info); // Custom settings
   final logger = CliLogger();
 
   // === BASIC LOGGING METHODS ===
