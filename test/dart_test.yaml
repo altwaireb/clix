@@ -1,0 +1,30 @@
+# Test configuration for Clix library
+# Run with: dart test
+
+# Default timeout for all tests
+timeout: 30s
+
+# Platform to run tests on
+test_on: vm
+
+# Test presets for different scenarios
+presets:
+  # Quick unit tests for development
+  unit:
+    timeout: 10s
+    paths: ["test/unit/**"]
+    
+  # Integration tests
+  integration:
+    timeout: 60s
+    paths: ["test/integration/**"]
+    
+  # All prompt tests
+  prompts:
+    timeout: 20s
+    paths: ["test/unit/prompts/**"]
+    
+  # Core component tests  
+  core:
+    timeout: 15s
+    paths: ["test/unit/core/**"]

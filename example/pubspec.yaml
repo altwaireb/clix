@@ -1,0 +1,18 @@
+name: clix_examples
+description: Examples demonstrating Clix library features
+version: 1.0.0
+publish_to: none  # This package is not meant to be published
+
+environment:
+  sdk: ^3.8.2
+
+dependencies:
+  # Main Clix library (using path dependency for development)
+  clix:
+    path: ../
+  
+  # Additional dependencies for examples
+  http: ^1.1.0
+
+dev_dependencies:
+  lints: ^6.0.0
