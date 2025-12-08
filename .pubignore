@@ -1,0 +1,23 @@
+# Exclude GIF files from published package
+# These are only needed for documentation display on GitHub/pub.dev
+# but not required for users who install the package
+assets/gifs/*
+
+# Exclude large assets but keep essential ones
+assets/*.png
+assets/*.jpg
+assets/*.jpeg
+assets/*.gif
+!assets/logo.png
+!assets/logo-favicon.png
+
+# Test files
+test/
+
+# IDE files
+.idea/
+.vscode/
+
+# Temporary files
+*.tmp
+*.temp

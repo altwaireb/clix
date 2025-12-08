@@ -22,6 +22,8 @@
 - **🧪 Testing Ready** - Built-in mock I/O for easy testing, unlike manual setup alternatives
 - **✅ Rich Validation** - Flexible validator system for all input types
 - **⚡ Modern API** - Clean `.interact()` syntax throughout, not verbose method calls
+- **🔢 Smart Numbers** ⭐ - Dedicated `Number` and `Decimal` prompts with range validation
+- **🔍 Advanced Search** ⭐ - Interactive search through large datasets with auto-completion  
 - **🎨 Advanced Styling** - Colors, themes, and sophisticated text formatting
 - **📝 Smart Logging** - Multi-level logging with timestamps and visual indicators
 - **⚙️ Config Management** - JSON/YAML with automatic validation, not manual file handling
@@ -63,6 +65,10 @@ void main() async {
 
 ## Interactive Prompts
 
+> ⭐ **Unique Features**: `Number`, `Decimal`, and `Search` prompts are exclusive to Clix - not found in other CLI packages!
+
+<!-- ![Basic Prompts Demo](https://raw.githubusercontent.com/altwaireb/clix/main/assets/gifs/basic-prompts.gif) -->
+
 ### Confirm
 
 ```dart
@@ -76,10 +82,10 @@ final useDefaults = await Confirm(
 ).interact();
 ```
 
-### Decimal
+### Decimal ⭐
 
 ```dart
-// Decimal number input
+// Floating-point input with precision control
 final price = await Decimal(
   'Enter price',
   min: 0.0,
@@ -110,6 +116,8 @@ final username = await Input(
 ).interact();
 ```
 
+![Basic Prompts Demo](https://raw.githubusercontent.com/altwaireb/clix/main/assets/gifs/prompts_demo.gif)
+
 ### MultiSelect
 
 ```dart
@@ -121,10 +129,10 @@ final features = await MultiSelect(
 ).interact();
 ```
 
-### Number
+### Number ⭐
 
 ```dart
-// Integer number input
+// Integer input with built-in range validation
 final age = await Number(
   'Enter your age',
   min: 0,
@@ -147,16 +155,18 @@ final newPassword = await Password(
 ).interact();
 ```
 
-### Search
+### Search ⭐
+
+![Search Prompt Demo](https://raw.githubusercontent.com/altwaireb/clix/main/assets/gifs/search_demo.gif)
 
 ```dart
-// Search in static list
+// Search in static list with auto-selection
 final country = await Search(
   'Search country',
   options: ['USA', 'UK', 'Germany', 'France', 'Japan'],
 ).interact();
 
-// Search with dynamic function
+// Search with dynamic function (API calls, databases, etc.)
 final result = await Search(
   'Search users',
   options: (query) async {
@@ -215,6 +225,8 @@ print(theme.error('Something went wrong'));
 ```
 
 ## Logging
+
+![Logger Features Demo](https://raw.githubusercontent.com/altwaireb/clix/main/assets/gifs/logger_demo.gif)
 
 ```dart
 // Quick setup and usage
@@ -318,6 +330,8 @@ final port = config.getValue<int>('database.port');
 ```
 
 ## Progress Indicators
+
+![Progress Demo](https://raw.githubusercontent.com/altwaireb/clix/main/assets/gifs/spinner_demo.gif)
 
 ### Spinners
 
@@ -459,4 +473,3 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - [API Documentation](https://pub.dev/documentation/clix)
 - [Issues & Bugs](https://github.com/altwaireb/clix/issues)
 - [Pub Package](https://pub.dev/packages/clix)
-```

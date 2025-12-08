@@ -102,23 +102,12 @@ class Select extends Prompt<int> {
     int selectedIndex,
     String selectedOption,
   ) {
-    // Move to the first option line and clear all options
-    io.write('\x1B[${options.length}A');
-    for (int i = 0; i < options.length; i++) {
-      io.write('\x1B[2K'); // Clear line
-      if (i < options.length - 1) {
-        io.write('\x1B[1B'); // Move to next line if not last
-      }
-    }
-
-    // Move back to first option position and show confirmation
-    io.write('\x1B[${options.length - 1}A');
+    // Move up to prompt line and clear everything below
+    io.write('\x1B[${options.length + 1}A\x1B[2K');
 
     final checkmark = theme.success('✓');
     final question = theme.primary(prompt);
-    final answer = theme.plain(
-      selectedOption,
-    ); // Show the actual text, not the index
+    final answer = theme.plain(selectedOption);
 
     io.writeln('$checkmark $question $answer');
   }

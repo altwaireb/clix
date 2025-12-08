@@ -82,8 +82,8 @@ class Input extends Prompt<String> {
     String result,
     String originalPrompt,
   ) {
-    // Return to start and clear the current line
-    io.write('\r\x1B[2K');
+    // Clear the input line and show confirmation (same as Confirm prompt)
+    io.write('\x1B[1A\x1B[2K'); // Move up and clear line
 
     final checkmark = theme.success('✓');
     final question = theme.primary(prompt);

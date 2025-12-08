@@ -15,6 +15,9 @@ topics:
   - prompts
   - dart-tools
 
+assets:
+  - assets/logo.png
+
 screenshots:
   - description: "Clix Logo - CLI Development Toolkit for Dart"
     path: assets/logo.png
@@ -22,7 +25,6 @@ screenshots:
 environment:
   sdk: ^3.8.2
 
-# Add regular dependencies here.
 dependencies:
   args: ^2.7.0
 

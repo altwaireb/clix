@@ -25,9 +25,6 @@ class Search extends Prompt<int> {
   @override
   Future<int> run(CliIO io, CliTheme theme) async {
     while (true) {
-      // Save cursor position before everything
-      io.write('\x1B[s'); // Save cursor position
-
       // Phase 1: Get search query
       final query = await _getSearchQuery(io, theme);
 
@@ -39,6 +36,21 @@ class Search extends Prompt<int> {
       if (results.isEmpty) {
         _showNoResults(io, theme);
         continue;
+      }
+
+      // If only one result, auto-select it without showing selection interface
+      if (results.length == 1) {
+        final selectedValue = results[0];
+        if (validator != null) {
+          final error = validator!(selectedValue);
+          if (error != null) {
+            _showValidationError(io, theme, error);
+            continue;
+          }
+        }
+        final originalIndex = _findOriginalIndex(selectedValue, results);
+        _showConfirmation(io, theme, selectedValue, 1);
+        return originalIndex;
       }
 
       // Phase 4: Show results with Select-style interface
@@ -64,7 +76,7 @@ class Search extends Prompt<int> {
 
       // Show confirmation and return original index
       final originalIndex = _findOriginalIndex(selectedValue, results);
-      _showConfirmation(io, theme, selectedValue);
+      _showConfirmation(io, theme, selectedValue, results.length);
       return originalIndex;
     }
   }
@@ -116,8 +128,12 @@ class Search extends Prompt<int> {
         ? defaultIndex!
         : 0;
 
+    // If only one result, auto-select it
+    if (results.length == 1) {
+      return 0;
+    }
+
     // Show initial screen - simpler like Select
-    _clearScreen(io);
     io.writeln('${theme.primary(prompt)}:');
 
     // Show initial options
@@ -245,16 +261,27 @@ class Search extends Prompt<int> {
     return searchResults.indexOf(selectedValue);
   }
 
-  void _clearScreen(CliIO io) {
-    io.write('\x1B[2J\x1B[H'); // Clear screen and move to top
-  }
+  void _showConfirmation(
+    CliIO io,
+    CliTheme theme,
+    String result, [
+    int? resultsCount,
+  ]) {
+    if (resultsCount != null && resultsCount > 1) {
+      // Clear the results display (options + help line + empty line)
+      final linesToClear =
+          resultsCount + 3; // results + empty line + help line + prompt line
+      io.write('\x1B[${linesToClear}A'); // Move up
+      for (int i = 0; i < linesToClear; i++) {
+        io.write('\x1B[2K'); // Clear line
+        if (i < linesToClear - 1) io.write('\x1B[1B'); // Move down if not last
+      }
+      io.write('\x1B[${linesToClear - 1}A'); // Move back to prompt line
+    } else {
+      // Single line clear for auto-selected results or simple cases
+      io.write('\x1B[1A\x1B[2K');
+    }
 
-  void _showConfirmation(CliIO io, CliTheme theme, String result) {
-    // Return to saved position and clear everything below
-    io.write('\x1B[u'); // Restore cursor position
-    io.write('\x1B[J'); // Clear from cursor to end of screen
-
-    // Show confirmation replacing the original line
     final checkmark = theme.success('✓');
     final question = theme.primary(prompt);
     final answer = theme.plain(result);
