@@ -41,7 +41,7 @@ Or add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  clix: ^1.0.0
+  clix: ^1.1.0
 ```
 
 ```dart
