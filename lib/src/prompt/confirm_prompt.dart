@@ -5,22 +5,22 @@ import 'prompt.dart';
 import '../core/io/cli_io.dart';
 import '../core/style/theme.dart';
 
-/// **🤔 Confirm Class - Yes/No confirmation prompt**
+/// **Confirm Class - Yes/No confirmation prompt**
 ///
 /// Boolean prompt for collecting yes/no decisions from users.
 /// Provides smart default handling and multiple input format support.
 class Confirm extends Prompt<bool> {
-  /// **❓ Prompt Text** - Question shown to user
+  /// **Prompt Text** - Question shown to user
   final String prompt;
 
-  /// **⚡ Default Value** - Default choice when user provides empty input
+  /// **Default Value** - Default choice when user provides empty input
   ///
   /// When `true`: Shows (Y/n) - Yes is default
   /// When `false`: Shows (y/N) - No is default
   /// When `null`: Shows (y/n) - No default, requires explicit choice
   final bool? defaultValue;
 
-  /// **🏗️ Constructor** - Create confirmation prompt
+  /// **Constructor** - Create confirmation prompt
   ///
   /// ```dart
   /// // Requires explicit choice
@@ -31,7 +31,7 @@ class Confirm extends Prompt<bool> {
   /// ```
   Confirm({required this.prompt, this.defaultValue});
 
-  /// **🎯 Run Prompt** - Execute confirmation with user interaction
+  /// **Run Prompt** - Execute confirmation with user interaction
   @override
   Future<bool> run(CliIO io, CliTheme theme) async {
     // Build prompt with default indication

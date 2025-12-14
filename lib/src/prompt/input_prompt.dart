@@ -5,18 +5,18 @@ import 'prompt.dart';
 import '../core/io/cli_io.dart';
 import '../core/style/theme.dart';
 
-/// **📝 Input Class - Text input prompt with validation**
+/// **Input Class - Text input prompt with validation**
 ///
 /// Collects text input from users with optional validation and default values.
 /// Extends the base Prompt class to provide string input functionality.
 class Input extends Prompt<String> {
-  /// **📋 Prompt Text** - Question or instruction shown to user
+  /// **Prompt Text** - Question or instruction shown to user
   final String prompt;
 
-  /// **⚡ Default Value** - Value used when user provides empty input
+  /// **Default Value** - Value used when user provides empty input
   final String? defaultValue;
 
-  /// **✅ Validator Function** - Optional validation with error messages
+  /// **Validator Function** - Optional validation with error messages
   ///
   /// Return `null` for valid input, or error message string for invalid input:
   /// ```dart
@@ -28,7 +28,7 @@ class Input extends Prompt<String> {
   /// ```
   final String? Function(String)? validator;
 
-  /// **🏗️ Constructor** - Create input prompt with optional features
+  /// **Constructor** - Create input prompt with optional features
   ///
   /// ```dart
   /// // Basic prompt
@@ -43,7 +43,7 @@ class Input extends Prompt<String> {
   /// ```
   Input({required this.prompt, this.defaultValue, this.validator});
 
-  /// **🎯 Run Prompt** - Execute the input prompt with user interaction
+  /// **Run Prompt** - Execute the input prompt with user interaction
   ///
   /// Displays the prompt, collects user input, validates it, and returns the result.
   /// Automatically retries on validation failures until valid input is provided.

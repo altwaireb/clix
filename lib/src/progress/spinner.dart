@@ -8,39 +8,39 @@ import '../core/style/color.dart';
 import '../core/style/theme.dart';
 import 'enums/spinner_type.dart';
 
-/// **🌀 Spinner Class - Animated loading indicator**
+/// **Spinner Class - Animated loading indicator**
 ///
 /// Provides animated visual feedback for long-running operations where
 /// completion time is unknown or variable.
 class Spinner {
-  /// **🎭 Animation Type** - Visual style of the spinner animation
+  /// **Animation Type** - Visual style of the spinner animation
   final SpinnerType _type;
 
-  /// **📝 Logger Instance** - Optional logger for final status messages
+  /// **Logger Instance** - Optional logger for final status messages
   final CliLogger? _logger;
 
-  /// **⏱️ Animation Interval** - Time between animation frames
+  /// **Animation Interval** - Time between animation frames
   final Duration _interval;
 
-  /// **🎨 Theme** - Color scheme for spinner styling
+  /// **Theme** - Color scheme for spinner styling
   final CliTheme _theme;
 
-  /// **⏲️ Animation Timer** - Controls the spinning animation
+  /// **Animation Timer** - Controls the spinning animation
   Timer? _timer;
 
-  /// **🎬 Frame Index** - Current position in animation sequence
+  /// **Frame Index** - Current position in animation sequence
   int _frameIndex = 0;
 
-  /// **⏰ Start Time** - When spinner started (for elapsed time)
+  /// **Start Time** - When spinner started (for elapsed time)
   DateTime? _startTime;
 
-  /// **🔄 Active State** - Whether spinner is currently running
+  /// **Active State** - Whether spinner is currently running
   bool _isActive = false;
 
-  /// **💬 Current Message** - Text displayed with spinner
+  /// **Current Message** - Text displayed with spinner
   String _currentMessage;
 
-  /// **🏗️ Constructor** - Create spinner with message and options
+  /// **Constructor** - Create spinner with message and options
   ///
   /// ```dart
   /// // Basic spinner

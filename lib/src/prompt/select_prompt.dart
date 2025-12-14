@@ -6,21 +6,21 @@ import 'prompt.dart';
 import '../core/io/cli_io.dart';
 import '../core/style/theme.dart';
 
-/// **🎯 Select Class - Single selection menu prompt**
+/// **Select Class - Single selection menu prompt**
 ///
 /// Interactive menu allowing users to select one option from a list using arrow keys.
 /// Returns the index of the selected option for flexible result handling.
 class Select extends Prompt<int> {
-  /// **❓ Prompt Text** - Instructions or question shown above menu
+  /// **Prompt Text** - Instructions or question shown above menu
   final String prompt;
 
-  /// **📜 Options List** - Available choices for selection
+  /// **Options List** - Available choices for selection
   final List<String> options;
 
-  /// **⚡ Default Index** - Initially selected option (0-based index)
+  /// **Default Index** - Initially selected option (0-based index)
   final int defaultIndex;
 
-  /// **🏗️ Constructor** - Create selection prompt with options
+  /// **Constructor** - Create selection prompt with options
   ///
   /// ```dart
   /// final select = Select(
@@ -31,7 +31,7 @@ class Select extends Prompt<int> {
   /// ```
   Select({required this.prompt, required this.options, this.defaultIndex = 0});
 
-  /// **🎯 Run Prompt** - Execute interactive selection
+  /// **Run Prompt** - Execute interactive selection
   @override
   Future<int> run(CliIO io, CliTheme theme) async {
     io.writeln(theme.primary(prompt));

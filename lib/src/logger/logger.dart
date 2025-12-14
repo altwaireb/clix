@@ -23,27 +23,27 @@ import '../progress/multi_spinner.dart';
 import '../table/table.dart';
 import 'log_level.dart';
 
-/// **🎯 CliLogger - Main logging class with comprehensive CLI features**
+/// **CliLogger - Main logging class with comprehensive CLI features**
 ///
 /// Central logging system providing styled output, progress tracking, and data display.
 /// Designed for professional CLI applications requiring rich terminal interaction.
 class CliLogger {
-  /// **📡 IO Interface** - Input/output operations (console, mock, etc.)
+  /// **IO Interface** - Input/output operations (console, mock, etc.)
   final CliIO io;
 
-  /// **🎨 Theme Configuration** - Styling and color scheme
+  /// **Theme Configuration** - Styling and color scheme
   final CliTheme theme;
 
-  /// **✏️ Text Formatter** - Message formatting and layout
+  /// **Text Formatter** - Message formatting and layout
   final CliFormatter formatter;
 
-  /// **📊 Minimum Log Level** - Filter messages below this level
+  /// **Minimum Log Level** - Filter messages below this level
   LogLevel minimumLevel;
 
-  /// **⏰ Timestamp Display** - Show timestamps with log messages
+  /// **Timestamp Display** - Show timestamps with log messages
   bool showTimestamps;
 
-  /// **🏗️ Full Constructor** - Complete logger configuration
+  /// **Full Constructor** - Complete logger configuration
   ///
   /// Create a logger with full control over all components:
   /// ```dart
@@ -269,7 +269,7 @@ class CliLogger {
     }
   }
 
-  /// **✅ Success Logging** - Positive outcomes and completions
+  /// **Success Logging** - Positive outcomes and completions
   ///
   /// Log successful operations, completions, and positive outcomes.
   /// Provides clear feedback when operations complete successfully.
@@ -873,7 +873,7 @@ class CliLogger {
     }
   }
 
-  /// **🎯 Message with Icon and Hint** - Display message with icon and hint
+  /// **Message with Icon and Hint** - Display message with icon and hint
   ///
   /// Combines icon display with hint functionality for rich, informative messages.
   /// Perfect for status updates with additional guidance or next steps.
@@ -992,7 +992,7 @@ class CliLogger {
   // Specialized Hint Methods
   // ========================================
 
-  /// **✅ Success with Hint** - Success message with additional guidance
+  /// **Success with Hint** - Success message with additional guidance
   ///
   /// Display successful operation outcome with helpful next steps or additional information.
   /// Perfect for guiding users after successful completion of tasks.
@@ -1031,7 +1031,7 @@ class CliLogger {
     );
   }
 
-  /// **✅ Success Icon with Hint** - Success icon message with guidance
+  /// **Success Icon with Hint** - Success icon message with guidance
   ///
   /// Display successful operation with checkmark icon and helpful next steps.
   /// Combines visual success indication with actionable guidance.
@@ -1270,7 +1270,7 @@ class CliLogger {
   // Color-Specific Hint Methods
   // ========================================
 
-  /// **🎯 Primary Color with Hint** - Primary colored message with guidance
+  /// **Primary Color with Hint** - Primary colored message with guidance
   ///
   /// Display messages in the primary brand color with helpful hints.
   /// Perfect for main actions, important information, and brand messaging.
