@@ -2,34 +2,34 @@
 
 <div align="center">
   <img src="https://raw.githubusercontent.com/altwaireb/clix/main/assets/logo.svg" alt="Clix Logo" height="80">
+  
+  <p><strong>Build beautiful, interactive CLI apps in Dart</strong></p>
+  
+  [![Pub Version](https://img.shields.io/pub/v/clix?style=flat-square&color=blue)](https://pub.dev/packages/clix)
+  [![Dart CI](https://github.com/altwaireb/clix/workflows/Dart%20CI/badge.svg)](https://github.com/altwaireb/clix/actions)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+  [![Pub Points](https://img.shields.io/pub/points/clix?style=flat-square&color=brightgreen)](https://pub.dev/packages/clix/score)
+  
 </div>
 
-<div align="center">
+---
 
-> A comprehensive CLI development toolkit for Dart - Build beautiful, interactive command-line applications with ease.
+## Why Clix? 
 
-[![Pub Version](https://img.shields.io/pub/v/clix)](https://pub.dev/packages/clix)
-[![Dart CI](https://github.com/altwaireb/clix/workflows/Dart%20CI/badge.svg)](https://github.com/altwaireb/clix/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Pub Points](https://img.shields.io/pub/points/clix)](https://pub.dev/packages/clix/score)
+A modern, batteries-included CLI toolkit for Dart,
+focused on interactive workflows and developer experience.
 
-</div>
+✨ **All-in-One** – Prompts, logging, progress, validation, styling, and more in a single package  
+🚀 **Production Ready** – 537+ automated tests ensure rock-solid reliability  
+🎯 **Type Safe** – Full null safety with comprehensive type support  
+🧪 **Test Friendly** – Built-in mock I/O for effortless testing  
+⚡ **Modern API** – Clean, fluent `.interact()` syntax throughout  
 
-## Features
+## When Clix Is a Good Fit
 
-- **🎯 Unified Solution** - All CLI tools in one package, no multiple dependencies needed
-- **💪 Type Safe** - Full Dart null safety with comprehensive type support  
-- **🧪 Testing Ready** - Built-in mock I/O for easy testing, unlike manual setup alternatives
-- **🛡️ Production Ready** - Clix is fully tested with more than 460 automated tests, ensuring stability, predictable behavior, and production-ready performance
-- **✅ Rich Validation** - Flexible validator system for all input types
-- **⚡ Modern API** - Clean `.interact()` syntax throughout, not verbose method calls
-- **🔢 Smart Numbers** ⭐ - Dedicated `Number` and `Decimal` prompts with range validation
-- **🔍 Advanced Search** ⭐ - Interactive search through large datasets with auto-completion  
-- **🎨 Advanced Styling** - Colors, themes, and sophisticated text formatting
-- **📝 Smart Logging** - Multi-level logging with timestamps and visual indicators
-- **⚙️ Config Management** - JSON/YAML with automatic validation, not manual file handling
-- **🎬 Progress Indicators** - Spinners and progress bars with full customization
-- **📊 Data Display** - Beautiful tables and structured output formatting
+Clix is ideal for interactive CLI tools, setup wizards, and developer utilities.
+
+For low-level argument parsing or simple one-off scripts, libraries like `args` may be more appropriate. Clix is designed to complement them, not replace them.
 
 ## Quick Start
 
@@ -41,341 +41,296 @@ Or add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  clix: ^1.1.0
+  clix: ^1.2.0
 ```
 
 ```dart
 import 'package:clix/clix.dart';
 
 void main() async {
-  // Interactive prompts
-  final name = await Input('Enter your name').interact();
+  // Get user input with validation
+  final name = await Input('Your name').interact();
   final confirmed = await Confirm('Continue?').interact();
   
-  // Logging with style
+  // Beautiful logging
   final logger = CliLogger.defaults();
-  logger.success('Welcome $name!');
+  logger.success('Welcome $name! 🎉');
   
-  // Progress indication
-  final spinner = Spinner('Processing...');
+  // Show progress
+  final spinner = Spinner('Setting things up...');
   spinner.start();
   await Future.delayed(Duration(seconds: 2));
-  spinner.complete('Done!');
+  spinner.complete('All done!');
 }
 ```
 
+![Basic Demo](https://raw.githubusercontent.com/altwaireb/clix/main/assets/gifs/prompts_demo.gif)
+
+---
+
 ## Interactive Prompts
 
-> ⭐ **Unique Features**: `Number`, `Decimal`, and `Search` prompts are exclusive to Clix - not found in other CLI packages!
-
-<!-- ![Basic Prompts Demo](https://raw.githubusercontent.com/altwaireb/clix/main/assets/gifs/basic-prompts.gif) -->
-
-### Confirm
+### Quick Examples
 
 ```dart
-// Basic confirmation
-final proceed = await Confirm('Continue with installation?').interact();
-
-// With default value
-final useDefaults = await Confirm(
-  'Use default settings?',
-  defaultValue: true, // Press Enter = Yes
-).interact();
-```
-
-### Decimal ⭐
-
-```dart
-// Floating-point input with precision control
-final price = await Decimal(
-  'Enter price',
-  min: 0.0,
-  max: 999.99,
-  defaultValue: 10.0,
-).interact();
-```
-
-### Input
-
-```dart
-// Basic input
-final name = await Input('Enter your name').interact();
-
-// With validation
+// Text input with validation
 final email = await Input(
-  'Email address',
-  validator: (value) {
-    if (!value.contains('@')) return 'Invalid email format';
-    return null;
-  },
+  'Email',
+  validator: (value) => value.contains('@') ? null : 'Invalid email',
 ).interact();
 
-// With default value
-final username = await Input(
-  'Username',
-  defaultValue: 'guest',
-).interact();
-```
+// Number input with range
+final age = await Number('Age', min: 0, max: 120).interact();
 
-![Basic Prompts Demo](https://raw.githubusercontent.com/altwaireb/clix/main/assets/gifs/prompts_demo.gif)
-
-### MultiSelect
-
-```dart
-// Multiple selection
-final features = await MultiSelect(
-  'Select features:',
-  ['Auth', 'Database', 'API', 'Testing'],
-  defaults: [0, 3], // Pre-select first and fourth
-).interact();
-```
-
-### Number ⭐
-
-```dart
-// Integer input with built-in range validation
-final age = await Number(
-  'Enter your age',
-  min: 0,
-  max: 120,
-  defaultValue: 25,
-).interact();
-```
-
-### Password
-
-```dart
-// Basic password
-final password = await Password('Enter password').interact();
-
-// With confirmation and validation
-final newPassword = await Password(
-  'Create password',
-  validator: (pwd) => pwd.length < 8 ? 'At least 8 characters' : null,
-  confirmation: true,
-).interact();
-```
-
-### Search ⭐
-
-![Search Prompt Demo](https://raw.githubusercontent.com/altwaireb/clix/main/assets/gifs/search_demo.gif)
-
-```dart
-// Search in static list with auto-selection
-final country = await Search(
-  'Search country',
-  options: ['USA', 'UK', 'Germany', 'France', 'Japan'],
-).interact();
-
-// Search with dynamic function (API calls, databases, etc.)
-final result = await Search(
-  'Search users',
-  options: (query) async {
-    return await searchUsers(query); // Returns List<String>
-  },
-  minQueryLength: 2,
-  maxResults: 5,
-).interact();
-```
-
-### Select
-
-```dart
-// Single selection
-final framework = await Select('Choose framework:', [
-  'Flutter', 'React Native', 'Ionic', 'Xamarin'
+// Choose from options
+final framework = await Select('Framework', [
+  'Flutter', 'React', 'Vue', 'Angular'
 ]).interact();
 
-// With default selection
-final env = await Select(
-  'Environment:',
-  ['Development', 'Staging', 'Production'],
-  defaultIndex: 0,
+// Multiple selection  
+final features = await MultiSelect('Features', [
+  'Auth', 'Database', 'API', 'Testing'
+]).interact();
+
+// Smart search through data
+final country = await Search('Country', options: [
+  'United States', 'United Kingdom', 'Germany', 'France'
+]).interact();
+```
+
+### Unique Features
+
+**Number & Decimal Prompts** – Built-in range validation, the only CLI package offering these:
+
+```dart
+final price = await Decimal('Price', min: 0.0, max: 999.99).interact();
+final quantity = await Number('Quantity', min: 1, max: 100).interact();
+```
+
+**Smart Search** – Interactive search with auto-completion:
+
+![Search Demo](https://raw.githubusercontent.com/altwaireb/clix/main/assets/gifs/search_demo.gif)
+
+```dart
+final result = await Search(
+  'Find user',
+  options: (query) async => await searchAPI(query), // Dynamic search
+  minQueryLength: 2,
 ).interact();
 ```
 
-## Styling and Colors
+---
 
-### Basic Colors
+## Validation System
+
+**Two approaches for maximum flexibility:**
+
+### Modern: ValidationRules (Recommended)
 
 ```dart
-print(CliColor.red('Error message'));
-print(CliColor.green('Success'));
-print(CliColor.blue('Information'));
-print(CliColor.yellow('Warning'));
+// Simple & clean - ValidationRules
+final username = await Input(
+  'Username',
+  validator: ValidationRules()
+    .required()
+    .min(3)
+    .alphaNumeric(),
+).interact();
 
-// Custom colors
-print(CliColor.rgb(255, 100, 50)('Custom orange'));
-print(CliColor.hex('#FF6B35')('Hex color'));
+// Advanced with custom messages - Validator.rules
+final password = await Input(
+  'Password',
+  validator: Validator.rules([
+    (value) => Validator.required(value, 'Password is required'),
+    (value) => Validator.min(value, 8, 'At least 8 characters'),
+    (value) => Validator.pattern(value, RegExp(r'[A-Z]'), 'Must contain uppercase'),
+    (value) => value.contains('password') ? 'Cannot contain "password"' : null,
+  ]),
+).interact();
 ```
 
-### Advanced Styling
+**Two modern approaches:** ValidationRules fluent API and Validator.rules array-based chains.
+
+**Available Rules:** `required()`, `min()`, `max()`, `email()`, `url()`, `numeric()`, `alpha()`, `alphaNumeric()`, `pattern()`, `custom()`, and more.
+
+### Custom: Validator Functions
 
 ```dart
+final username = await Input(
+  'Username',
+  validator: (value) {
+    if (value.length < 3) return 'Too short';
+    if (value.length > 20) return 'Too long';
+    if (RegExp(r'[^a-zA-Z0-9]').hasMatch(value)) return 'Only letters and numbers';
+    if (['admin', 'root'].contains(value.toLowerCase())) return 'Reserved name';
+    return null; // Valid
+  },
+).interact();
+```
+
+---
+
+## Logging & Output
+
+### Simple & Effective
+
+```dart
+final logger = CliLogger();
+
+// Basic levels
+logger.info('App started');
+logger.success('Task completed');
+logger.warn('Warning message');  
+logger.error('Something failed');
+
+// With helpful hints
+logger.successWithHint('Build completed', hint: 'Run: dart test');
+logger.errorWithHint('Connection failed', hint: 'Check network');
+```
+
+![Logger Demo](https://raw.githubusercontent.com/altwaireb/clix/main/assets/gifs/logger_demo.gif)
+
+### Colors & Styling
+
+```dart
+// Colors
+logger.red('Error text');
+logger.green('Success text');
+logger.blue('Info text');
+
+// Custom styling
 final style = CliStyle()
-    .withColor(CliColor.cyan)
-    .makeBold()
-    .makeUnderline();
+  .withColor(CliColor.cyan)
+  .makeBold()
+  .makeUnderline();
 
 print(style.format('Styled text'));
-
-// Using themes
-final theme = CliTheme.defaultTheme();
-print(theme.success('Operation completed'));
-print(theme.error('Something went wrong'));
 ```
 
-## Logging
-
-![Logger Features Demo](https://raw.githubusercontent.com/altwaireb/clix/main/assets/gifs/logger_demo.gif)
+### Custom Themes
 
 ```dart
-// Quick setup and usage
-final logger = CliLogger.defaults();
-logger.info('App started');
-logger.successIcon('Task completed successfully');
-logger.onSuccess('Operation finished', padding: Padding.medium);
+// Create custom theme with hex colors
+final customTheme = CliTheme(
+  primary: CliStyle().withColor(CliColor.hex('#FF6B6B')), // Coral Red
+  secondary: CliStyle().withColor(CliColor.hex('#4ECDC4')), // Teal
+  success: CliStyle().withColor(CliColor.hex('#45B7D1')), // Sky Blue
+  warn: CliStyle().withColor(CliColor.hex('#FFA726')), // Orange
+  error: CliStyle().withColor(CliColor.hex('#E74C3C')), // Red
+);
 
-// Messages with helpful hints
-logger.successWithHint('Build completed', hint: 'Run tests with: dart test');
-logger.errorWithHint('Connection failed', hint: 'Check network settings');
-logger.primaryWithHint('Welcome!', hint: 'Type help for commands', 
-  spacing: Spacing.large, hintSymbol: HintSymbol.lightBulb);
+final customLogger = CliLogger(theme: customTheme);
+customLogger.primary('Custom branded colors');
+customLogger.success('Success with custom theme');
 ```
 
-### Setup
-
-- `CliLogger.defaults()` - Simple logger with default settings
-- `CliLogger.create(showTimestamps: true, minimumLevel: LogLevel.info)` - Custom configuration
-
-### Core Methods
-
-- `debug()` - Debug information (filtered in production)
-- `info()` - General information and status updates  
-- `warn()` - Warnings and potential issues
-- `error()` - Critical errors and failures
-- `success()` - Positive outcomes and completions
-- `plain()` - Unstyled raw output
-
-### Color Methods
-
-- `red()` - Red text
-- `green()` - Green text
-- `blue()` - Blue text
-- `yellow()` - Yellow text
-- `cyan()` - Cyan text
-- `white()` - White text
-- `primary()` - Primary theme color
-- `secondary()` - Secondary theme color
-
-### Messages with Hints ⭐
-
-Display messages with additional guidance and context using customizable spacing and symbols:
+### Additional Logger Features
 
 ```dart
-// Basic usage with default gray hints
-logger.successWithHint('Build completed', hint: 'Run tests next');
-logger.errorWithHint('Connection failed', hint: 'Check network settings');
+// Background colors
+logger.onSuccess('Success background');
+logger.onError('Error background');
+logger.onWarning('Warning background');
 
-// With custom spacing and symbols
-logger.primaryWithHint(
-  'Welcome to App',
-  hint: 'Type help for commands',
-  spacing: Spacing.large,
-  hintSymbol: HintSymbol.lightBulb,
+// Icons & formatting
+logger.successIcon('Done!');
+logger.errorIcon('Failed');
+logger.tree('Project structure');
+logger.point('Bullet point');
+logger.newLine(); // Spacing
+```
+
+---
+
+## Progress & Feedback
+
+### Spinners
+
+```dart
+final spinner = Spinner('Loading...');
+
+// Update message
+spinner.update('Processing...');
+await Future.delayed(Duration(seconds: 2));
+
+// Finish
+spinner.complete('Success!');
+// or spinner.fail('Failed');
+```
+
+![Spinner Demo](https://raw.githubusercontent.com/altwaireb/clix/main/assets/gifs/spinner_demo.gif)
+
+**Spinner Types:** `dots`, `line`, `pipe`, `clock`, `arrow`, `triangle`, `square`, `circle`
+
+### Progress Bars & Multi-Spinners
+
+```dart
+// Progress bar
+final progress = logger.progress(total: 100);
+for (int i = 0; i <= 100; i += 10) {
+  progress.update(i, 'Step $i/100');
+  await Future.delayed(Duration(milliseconds: 100));
+}
+progress.complete();
+
+// Multiple concurrent tasks
+final multiSpinner = logger.multiSpinner();
+
+// Add tasks
+multiSpinner.add('packages', 'Downloading packages');
+multiSpinner.add('env', 'Setting up environment');
+
+// Start tasks
+multiSpinner.startTask('packages');
+multiSpinner.startTask('env');
+
+// Complete first task
+await Future.delayed(Duration(milliseconds: 800));
+multiSpinner.complete('packages', 'Packages downloaded');
+
+// Update second task message
+await Future.delayed(Duration(milliseconds: 600));
+multiSpinner.updateMessage('env', 'Configuring environment');
+
+// Complete second task
+await Future.delayed(Duration(milliseconds: 400));
+multiSpinner.complete('env', 'Environment ready');
+
+// Stop all tasks
+await Future.delayed(Duration(milliseconds: 200));
+multiSpinner.stop();
+```
+
+---
+
+## Data Display
+
+### Tables
+
+```dart
+logger.table(
+  columns: [
+    TableColumn('Name'),
+    TableColumn('Age', alignment: TableAlignment.center),
+    TableColumn('City', alignment: TableAlignment.right),
+  ],
+  rows: [
+    ['Alice', '25', 'New York'],
+    ['Bob', '30', 'London'], 
+    ['Charlie', '35', 'Tokyo'],
+  ],
 );
 ```
 
-#### Core Hint Methods
-
-- `messageWithHint()` - Custom message with hint
-- `messageIconWithHint()` - Custom message with icon and hint
-
-#### Level-Based Hint Methods
-
-- `successWithHint()` - Success message with guidance
-- `successIconWithHint()` - Success with ✅ icon and hint
-- `errorWithHint()` - Error message with troubleshooting
-- `errorIconWithHint()` - Error with ❌ icon and hint
-- `warnWithHint()` - Warning with recommendations  
-- `warnIconWithHint()` - Warning with ⚠️ icon and hint
-- `infoWithHint()` - Information with context
-- `infoIconWithHint()` - Info with ℹ️ icon and hint
-
-#### Color-Specific Hint Methods
-
-- `primaryWithHint()` - Primary color message with hint
-- `secondaryWithHint()` - Secondary color message with hint
-- `whiteWithHint()` - White color message with hint
-
-#### Hint Symbols
-
-- `HintSymbol.dot` (•) - Clean and minimal
-- `HintSymbol.arrow` (→) - Next action indicator
-- `HintSymbol.lightBulb` (💡) - Tips and suggestions
-- `HintSymbol.star` (★) - Important highlights
-- `HintSymbol.info` (ℹ) - Informational hints
-- Plus 7 more symbols: `dash`, `pipe`, `chevron`, `diamond`, `triangle`, `doubleArrow`, `none`
-
-#### Spacing Levels
-
-- `Spacing.none` - No spacing (0)
-- `Spacing.small` - 2 spaces between message and hint
-- `Spacing.medium` - 4 spaces (default)
-- `Spacing.large` - 6 spaces
-- `Spacing.extraLarge` - 8 spaces
-- `Spacing.huge` - 10 spaces
-
-### Background Colors
-
-- `onRed()` - Red background
-- `onGreen()` - Green background
-- `onBlue()` - Blue background
-- `onYellow()` - Yellow background
-- `onWhite()` - White background
-- `onBlack()` - Black background
-- `onSuccess()` - Success background
-- `onError()` - Error background
-- `onWarning()` - Warning background
-- `onInfo()` - Info background
-
-### Icon Methods
-
-- `successIcon()` - Success message with ✅ icon
-- `errorIcon()` - Error message with ❌ icon
-- `warnIcon()` - Warning message with ⚠️ icon
-- `infoIcon()` - Info message with ℹ️ icon
-- `ideaIcon()` - Tip message with 💡 icon
-- `withIcon(message, icon: CliIcons.star)` - Custom predefined icon
-- `withIconCustom(message, icon: '🚀')` - Custom emoji icon
-
-### Structure and Formatting
-
-- `tree()` - Tree structure with symbols
-- `point()` - Bullet points and lists
-- `lines()` - Multiple lines with same level
-- `newLine()` - Empty line spacing
-- `promptResult()` - Display prompt results
-- All methods support `indent: IndentLevel.level1` parameter
-
-### Progress Integration
-
-- `logger.progress(total: 100)` - Create progress bar
-- `logger.spinner('Loading...')` - Create spinner
-- `logger.multiSpinner()` - Create multi-spinner
-- `logger.table()` - Create formatted table
-
-## Configuration Management
-
-### JSON Configuration
+### Configuration Management
 
 ```dart
+// JSON configuration
 final config = CliConfig.fromJson('config.json');
 await config.load();
 
 final apiUrl = config.getValue<String>('api.url');
 final timeout = config.getValue<int>('api.timeout', defaultValue: 30);
-final features = config.getValue<List>('features', defaultValue: []);
 
 // Validation
 final errors = config.validate();
@@ -384,112 +339,68 @@ if (errors.isNotEmpty) {
 }
 ```
 
-### YAML Configuration
+---
 
-```dart
-final config = CliConfig.fromYaml('database.yaml');
-await config.load();
+## Testing Made Easy
 
-final host = config.getValue<String>('database.host');
-final port = config.getValue<int>('database.port');
-```
-
-## Progress Indicators
-
-![Progress Demo](https://raw.githubusercontent.com/altwaireb/clix/main/assets/gifs/spinner_demo.gif)
-
-### Spinners
-
-```dart
-final spinner = Spinner('Loading data...');
-spinner.start();
-
-// Update message
-spinner.update('Processing...');
-await Future.delayed(Duration(seconds: 2));
-
-// Complete
-spinner.complete('Data loaded successfully');
-// or spinner.fail('Failed to load data');
-```
-
-### Spinner Types
-
-```dart
-Spinner('Working...', type: SpinnerType.dots);   // ⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏
-Spinner('Working...', type: SpinnerType.line);   // |/-\
-Spinner('Working...', type: SpinnerType.pipe);   // ┤┘┴└├┌┬┐
-Spinner('Working...', type: SpinnerType.star);   // ✶✸✹✺✹✷
-```
-
-## Testing
+Clix includes built-in mock I/O for seamless testing:
 
 ```dart
 import 'package:test/test.dart';
 import 'package:clix/clix.dart';
 
-test('prompt interaction', () async {
+test('user interaction', () async {
   final mockIO = MockIO();
   final theme = CliTheme.defaultTheme();
   
-  // Setup mock responses
-  mockIO.setInput(['John Doe', 'y']);
+  // Setup responses
+  mockIO.setInput(['John', 'y']);
   
   // Test prompts
   final name = await Input('Name').interact(mockIO, theme);
   final confirmed = await Confirm('Continue?').interact(mockIO, theme);
   
-  expect(name, equals('John Doe'));
+  expect(name, equals('John'));
   expect(confirmed, isTrue);
-  
-  // Verify output
-  final output = mockIO.getOutput();
-  expect(output, contains('Name:'));
 });
 ```
+
+---
 
 ## Complete Example
 
 ```dart
 import 'package:clix/clix.dart';
 
-void main() async {
-  final logger = CliLogger.defaults();
+Future<void> main() async {
+  final logger = CliLogger();
   
   logger.primary('Project Setup Wizard');
   logger.newLine();
   
   try {
-    // Gather information
-    final projectName = await Input(
+    // Gather project info
+    final name = await Input(
       'Project name',
-      validator: (name) {
-        if (name.isEmpty) return 'Name required';
-        if (!RegExp(r'^[a-z][a-z0-9_]*$').hasMatch(name)) {
-          return 'Invalid format';
-        }
-        return null;
-      },
+      validator: ValidationRules()
+        .required('Project name is required')
+        .pattern(RegExp(r'^[a-z][a-z0-9_]*$'), 'Invalid format'),
     ).interact();
     
-    final framework = await Select('Framework:', [
+    final framework = await Select('Framework', [
       'Flutter', 'Dart Console', 'Web App'
     ]).interact();
     
-    final features = await MultiSelect(
-      'Features:',
-      ['Auth', 'Database', 'API', 'Testing'],
-      defaults: [3], // Pre-select Testing
-    ).interact();
+    final features = await MultiSelect('Features', [
+      'Authentication', 'Database', 'API', 'Testing'
+    ]).interact();
     
-    // Confirm and create
-    final shouldCreate = await Confirm(
-      'Create project with these settings?'
-    ).interact();
+    // Confirm setup
+    final proceed = await Confirm('Create project?').interact();
     
-    if (shouldCreate) {
+    if (proceed) {
+      // Show progress
       final spinner = Spinner('Creating project...');
-      spinner.start();
       
       await Future.delayed(Duration(seconds: 2));
       spinner.update('Installing dependencies...');
@@ -497,17 +408,16 @@ void main() async {
       
       spinner.complete('Project created! 🎉');
       
-      logger.newLine();
-      logger.successWithHint('Project: $projectName', 
-        hint: 'Navigate with: cd $projectName');
-      logger.infoWithHint('Framework: $framework', 
-        hint: 'Run with: dart run');
-      logger.primaryWithHint('Features: ${features.join(', ')}', 
-        hint: 'Configure in pubspec.yaml', 
-        spacing: Spacing.large);
-    } else {
-      logger.warnWithHint('Setup cancelled', 
-        hint: 'Run again anytime to restart setup');
+      // Results
+      logger.successWithHint(
+        'Project: $name',
+        hint: 'cd $name',
+      );
+      logger.infoWithHint(
+        'Framework: $framework',
+        hint: 'dart run',
+      );
+      logger.primary('Features: ${features.join(', ')}');
     }
     
   } catch (e) {
@@ -516,30 +426,44 @@ void main() async {
 }
 ```
 
-## Examples
+---
 
-Run example applications:
+## Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **🎯 Interactive Prompts** | Input, Select, MultiSelect, Confirm, Number, Decimal, Search, Password |
+| **✅ Smart Validation** | ValidationRules fluent API + traditional validator functions |
+| **🎨 Rich Styling** | Colors, themes, backgrounds, icons, and custom formatting |
+| **📝 Advanced Logging** | Multi-level logging with hints, icons, and timestamps |
+| **🎬 Progress Indicators** | Spinners, progress bars, multi-spinners with customization |
+| **📊 Data Display** | Tables, structured output, and configuration management |
+| **🧪 Testing Support** | Built-in MockIO for comprehensive testing |
+| **🛡️ Production Ready** | 537+ automated tests, null safety, comprehensive error handling |
+
+---
+
+## Examples & Resources
 
 ```bash
-# Basic prompts
-dart example/prompts/all_prompts_example.dart
-
-# Icon logging
-dart example/prompts/icon_methods_example.dart
-
-# Configuration
-dart example/config/basic_usage.dart
-
-# Password handling
-dart example/prompts/password_example.dart
+# Try the examples
+dart run example/basic_prompts.dart
+dart run example/config_example.dart
+dart run example/validation_demo.dart
+dart run example/complete_demo.dart
 ```
 
-## License
+- 📖 [Full API Documentation](https://pub.dev/documentation/clix)
+- 🐛 [Report Issues](https://github.com/altwaireb/clix/issues)
+- 📦 [Pub Package](https://pub.dev/packages/clix)
 
-MIT License - see [LICENSE](LICENSE) file for details.
+---
 
-## Links
+<div align="center">
+  
+**Built with ❤️ for the Dart community**
 
-- [API Documentation](https://pub.dev/documentation/clix)
-- [Issues & Bugs](https://github.com/altwaireb/clix/issues)
-- [Pub Package](https://pub.dev/packages/clix)
+[⭐ Star on GitHub](https://github.com/altwaireb/clix) • [📖 Documentation](https://pub.dev/documentation/clix) • [💬 Discussions](https://github.com/altwaireb/clix/discussions)
+
+</div>
+

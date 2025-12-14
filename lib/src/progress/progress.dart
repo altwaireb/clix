@@ -7,30 +7,30 @@ import '../core/style/style.dart';
 import '../core/style/theme.dart';
 import 'enums/progress_style.dart';
 
-/// **📊 Progress Class - Visual progress tracking bar**
+/// **Progress Class - Visual progress tracking bar**
 ///
 /// Displays progress as a visual bar with percentage completion.
 /// Perfect for file operations, downloads, installations, and batch processing.
 class Progress {
-  /// **📡 IO Interface** - Output operations for progress display
+  /// **IO Interface** - Output operations for progress display
   final CliIO io;
 
-  /// **🎯 Total Steps** - Maximum value representing 100% completion
+  /// **Total Steps** - Maximum value representing 100% completion
   final int total;
 
-  /// **📏 Bar Width** - Character width of the progress bar
+  /// **Bar Width** - Character width of the progress bar
   final int width;
 
-  /// **🎨 Visual Style** - Progress bar appearance and format
+  /// **Visual Style** - Progress bar appearance and format
   final ProgressStyle style;
 
-  /// **🎭 Theme** - Color scheme for progress bar styling
+  /// **Theme** - Color scheme for progress bar styling
   final CliTheme theme;
 
-  /// **📈 Current Progress** - Current completion value
+  /// **Current Progress** - Current completion value
   int _current = 0;
 
-  /// **🏗️ Constructor** - Create progress bar with configuration
+  /// **Constructor** - Create progress bar with configuration
   ///
   /// ```dart
   /// // Simple progress bar

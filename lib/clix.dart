@@ -111,6 +111,13 @@ export 'src/prompt/search_prompt.dart';
 export 'src/prompt/multi_select_prompt.dart';
 export 'src/prompt/password_prompt.dart';
 
+/// ### **Input Validation**
+/// - [Validator] - Static validation methods for common patterns
+/// - [ValidationRules] - Fluent builder for validation chains
+
+export 'src/validation/validator.dart';
+export 'src/validation/validation_rules.dart';
+
 /// ### **Progress & Loading**
 /// - [Progress] - Progress bars with multiple styles
 /// - [Spinner] - Loading spinners (8+ animation types)
