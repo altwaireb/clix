@@ -695,6 +695,90 @@ class CliLogger {
     io.writeln(colorFunc(indentedMessage));
   }
 
+  /// Print with a mark and custom colors
+  void withMark(
+    String message, {
+    required CliIcons mark,
+    CliColor markColor = CliColor.white,
+    CliColor color = CliColor.white,
+    IndentLevel indent = IndentLevel.none,
+  }) {
+    final markColorFunc = markColor;
+    final colorFunc = color;
+    final formattedMessage = formatter.format(message);
+
+    io.writeln(
+      '${indent.spacing}${markColorFunc(mark.symbol)} '
+      '${colorFunc(formattedMessage)}',
+    );
+  }
+
+  /// Print with a success mark (check mark) and message
+  void successMark(String message, {IndentLevel indent = IndentLevel.none}) {
+    withMark(
+      message,
+      mark: CliIcons.check,
+      markColor: CliColor.success,
+      color: CliColor.white,
+      indent: indent,
+    );
+  }
+
+  /// Print with an error mark (cross mark) and message
+  void errorMark(String message, {IndentLevel indent = IndentLevel.none}) {
+    withMark(
+      message,
+      mark: CliIcons.cross,
+      markColor: CliColor.error,
+      color: CliColor.white,
+      indent: indent,
+    );
+  }
+
+  /// Print with a warning mark and message
+  void warningMark(String message, {IndentLevel indent = IndentLevel.none}) {
+    withMark(
+      message,
+      mark: CliIcons.warningMark,
+      markColor: CliColor.warning,
+      color: CliColor.white,
+      indent: indent,
+    );
+  }
+
+  /// Print with an info mark and message
+  void infoMark(String message, {IndentLevel indent = IndentLevel.none}) {
+    withMark(
+      message,
+      mark: CliIcons.infoMark,
+      markColor: CliColor.info,
+      color: CliColor.white,
+      indent: indent,
+    );
+  }
+
+  /// Print with a plus mark and message
+  void plusMark(String message, {IndentLevel indent = IndentLevel.none}) {
+    withMark(
+      message,
+      mark: CliIcons.plus,
+      markColor: CliColor.white,
+      color: CliColor.white,
+      indent: indent,
+    );
+  }
+
+  /// Print with a minus mark and message
+  void minusMark(String message, {IndentLevel indent = IndentLevel.none}) {
+    withMark(
+      message,
+      mark: CliIcons.minus,
+      markColor: CliColor.white,
+      color: CliColor.white,
+      indent: indent,
+    );
+  }
+
   /// Print with tree structure
   void tree(
     String message, {

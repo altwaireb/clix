@@ -104,7 +104,13 @@ enum CliIcons {
   circle,
 
   /// ■ Square symbol
-  square;
+  square,
+
+  /// ℹ Text information mark
+  infoMark,
+
+  /// ⚠ Text warning mark
+  warningMark;
 
   /// Returns the visual symbol for this icon.
   ///
@@ -168,11 +174,15 @@ enum CliIcons {
       case CliIcons.plus:
         return "+";
       case CliIcons.minus:
-        return "-";
+        return "−";
       case CliIcons.circle:
         return "●";
       case CliIcons.square:
         return "■";
+      case CliIcons.infoMark:
+        return "ⓘ";
+      case CliIcons.warningMark:
+        return "△";
     }
   }
 

@@ -269,6 +269,86 @@ void main() {
         expect(mockIO.outputs.first, contains('Idea with icon'));
       });
     });
+    group('Mark Methods', () {
+      test('should log message with custom mark and colors', () {
+        logger.withMark(
+          'Message with mark',
+          mark: CliIcons.check,
+          markColor: CliColor.green,
+          color: CliColor.white,
+        );
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('✓'));
+        expect(mockIO.outputs.first, contains('Message with mark'));
+      });
+
+      test('should log success message with mark', () {
+        logger.successMark('Success with mark');
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('✓'));
+        expect(mockIO.outputs.first, contains('Success with mark'));
+      });
+
+      test('should log error message with mark', () {
+        logger.errorMark('Error with mark');
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('✗'));
+        expect(mockIO.outputs.first, contains('Error with mark'));
+      });
+
+      test('should log warning message with mark', () {
+        logger.warningMark('Warning with mark');
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('△'));
+        expect(mockIO.outputs.first, contains('Warning with mark'));
+      });
+
+      test('should log info message with mark', () {
+        logger.infoMark('Info with mark');
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('ⓘ'));
+        expect(mockIO.outputs.first, contains('Info with mark'));
+      });
+
+      test('should log plus message with mark', () {
+        logger.plusMark('Plus with mark');
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('+'));
+        expect(mockIO.outputs.first, contains('Plus with mark'));
+      });
+
+      test('should log minus message with mark', () {
+        logger.minusMark('Minus with mark');
+
+        expect(mockIO.outputs, hasLength(1));
+        expect(mockIO.outputs.first, contains('−'));
+        expect(mockIO.outputs.first, contains('Minus with mark'));
+      });
+
+      test('should apply indentation before the mark', () {
+        logger.successMark('Indented success', indent: IndentLevel.level2);
+
+        expect(mockIO.outputs, hasLength(1));
+
+        final output = mockIO.outputs.first;
+
+        expect(output, startsWith('    '));
+        expect(output, contains('✓'));
+        expect(output, contains('Indented success'));
+      });
+
+      test('should use text symbols for info and warning marks', () {
+        expect(CliIcons.infoMark.symbol.runes.toList(), equals([0x24D8]));
+
+        expect(CliIcons.warningMark.symbol.runes.toList(), equals([0x25B3]));
+      });
+    });
 
     group('Tree Structure Methods', () {
       test('should log message with tree structure', () {
