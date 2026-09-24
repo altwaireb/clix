@@ -1,60 +1,167 @@
-import 'package:args/args.dart';
+// Copyright (c) 2014, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
 
-/// Enhanced wrapper for ArgResults with Clix utilities
+import 'dart:collection';
+
+import 'cli_parser.dart';
+
+/// Creates a new [CliArgResults].
+///
+/// Since [CliArgResults] doesn't have a public constructor, this lets [CliParser]
+/// get to it. This function isn't exported to the public API of the package.
+CliArgResults newCliArgResults(
+  CliParser parser,
+  Map<String, dynamic> parsed,
+  String? name,
+  CliArgResults? command,
+  List<String> rest,
+  List<String> arguments,
+) {
+  return CliArgResults._(parser, parsed, name, command, rest, arguments);
+}
+
+/// The results of parsing a series of command line arguments using
+/// [CliParser.parse].
+///
+/// Includes the parsed options and any remaining unparsed command line
+/// arguments.
 class CliArgResults {
-  final ArgResults _results;
+  /// The [CliParser] whose options were parsed for these results.
+  final CliParser _parser;
 
-  CliArgResults._(this._results);
+  /// The option values that were parsed from arguments.
+  final Map<String, dynamic> _parsed;
 
-  /// Factory constructor to create CliArgResults from ArgResults
-  factory CliArgResults.from(ArgResults results) => CliArgResults._(results);
+  /// The name of the command for which these options are parsed, or `null` if
+  /// these are the top-level results.
+  final String? name;
 
-  /// Get the value of a flag
-  bool flag(String name) => _results[name] as bool? ?? false;
+  /// The command that was selected, or `null` if none was.
+  ///
+  /// This will contain the options that were selected for that command.
+  final CliArgResults? command;
 
-  /// Get the value of an option
-  String? option(String name) => _results[name] as String?;
+  /// The remaining command-line arguments that were not parsed as options or
+  /// flags.
+  ///
+  /// If `--` was used to separate the options from the remaining arguments,
+  /// it will not be included in this list unless parsing stopped before the
+  /// `--` was reached.
+  final List<String> rest;
 
-  /// Get the values of a multi-option
-  List<String>? multiOption(String name) => _results[name] as List<String>?;
+  /// The original arguments that were parsed.
+  final List<String> arguments;
 
-  /// Get remaining positional arguments
-  List<String> get rest => _results.rest;
+  CliArgResults._(
+    this._parser,
+    this._parsed,
+    this.name,
+    this.command,
+    List<String> rest,
+    List<String> arguments,
+  ) : rest = UnmodifiableListView(rest),
+      arguments = UnmodifiableListView(arguments);
 
-  /// Get remaining arguments (alias for rest)
-  List<String> get arguments => _results.rest;
+  /// Returns the parsed or default command-line option named [name].
+  ///
+  /// [name] must be a valid option name in the parser.
+  ///
+  /// > [!Note]
+  /// > Callers should prefer using the more strongly typed methods - [flag] for
+  /// > flags, [option] for options, and [multiOption] for multi-options.
+  dynamic operator [](String name) {
+    if (!_parser.options.containsKey(name)) {
+      throw ArgumentError('Could not find an option named "--$name".');
+    }
 
-  /// Get the first positional argument, if any
-  String? get firstArgument =>
-      _results.rest.isNotEmpty ? _results.rest.first : null;
-
-  /// Get the last positional argument, if any
-  String? get lastArgument =>
-      _results.rest.isNotEmpty ? _results.rest.last : null;
-
-  /// Get argument at specific index
-  String? argumentAt(int index) {
-    return index < _results.rest.length ? _results.rest[index] : null;
+    final option = _parser.options[name]!;
+    return option.valueOrDefault(_parsed[name]);
   }
 
-  /// Check if an option was provided
-  bool wasParsed(String name) => _results.wasParsed(name);
+  /// Returns the parsed or default command-line flag named [name].
+  ///
+  /// [name] must be a valid flag name in the parser.
+  bool flag(String name) {
+    final option = _parser.options[name];
 
-  /// Get all options
-  Iterable<String> get options => _results.options;
+    if (option == null) {
+      throw ArgumentError('Could not find a flag named "--$name".');
+    }
 
-  /// Get command information if this is a command
-  CliArgResults? get command {
-    final cmd = _results.command;
-    return cmd != null ? CliArgResults.from(cmd) : null;
+    if (!option.isFlag) {
+      throw ArgumentError('"$name" is not a flag.');
+    }
+
+    return option.valueOrDefault(_parsed[name]) as bool;
   }
 
-  /// Get command name if this is a command
-  String? get commandName => _results.command?.name;
+  /// Returns the parsed or default command-line option named [name].
+  ///
+  /// [name] must be a valid option name in the parser.
+  String? option(String name) {
+    final option = _parser.options[name];
 
-  /// Access the underlying ArgResults for advanced usage
-  ArgResults get original => _results;
+    if (option == null) {
+      throw ArgumentError('Could not find an option named "--$name".');
+    }
 
-  /// Access option value with [] operator
-  dynamic operator [](String name) => _results[name];
+    if (!option.isSingle) {
+      throw ArgumentError('"$name" is a multi-option.');
+    }
+
+    return option.valueOrDefault(_parsed[name]) as String?;
+  }
+
+  /// Returns the list of parsed (or default) command-line options for [name].
+  ///
+  /// [name] must be a valid option name in the parser.
+  List<String> multiOption(String name) {
+    final option = _parser.options[name];
+
+    if (option == null) {
+      throw ArgumentError('Could not find an option named "--$name".');
+    }
+
+    if (!option.isMultiple) {
+      throw ArgumentError('"$name" is not a multi-option.');
+    }
+
+    return option.valueOrDefault(_parsed[name]) as List<String>;
+  }
+
+  /// The names of the available options.
+  ///
+  /// Includes the options whose values were parsed or that have defaults.
+  /// CliOptions that weren't present and have no default are omitted.
+  Iterable<String> get options {
+    final result = _parsed.keys.toSet();
+
+    // Include the options that have defaults.
+    _parser.options.forEach((name, option) {
+      if (option.defaultsTo != null) {
+        result.add(name);
+      }
+    });
+
+    return result;
+  }
+
+  /// The name of the command that produced these results.
+  String? get commandName => command?.name;
+
+  /// Returns `true` if the option with [name] was parsed from an actual
+  /// argument.
+  ///
+  /// Returns `false` if it wasn't provided and the default value or no default
+  /// value would be used instead.
+  ///
+  /// [name] must be a valid option name in the parser.
+  bool wasParsed(String name) {
+    if (!_parser.options.containsKey(name)) {
+      throw ArgumentError('Could not find an option named "--$name".');
+    }
+
+    return _parsed.containsKey(name);
+  }
 }

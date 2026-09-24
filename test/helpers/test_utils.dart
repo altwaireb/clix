@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:test/test.dart';
 import 'package:clix/src/core/style/theme.dart';
 import 'mock_io.dart';
@@ -56,5 +58,20 @@ class TestUtils {
   /// Clear everything and prepare for next test
   static void resetMockIO(MockIO mockIO) {
     mockIO.reset();
+  }
+
+  static Future<String> captureOutput(Future<void> Function() action) async {
+    final output = StringBuffer();
+
+    await runZoned(
+      action,
+      zoneSpecification: ZoneSpecification(
+        print: (self, parent, zone, line) {
+          output.writeln(line);
+        },
+      ),
+    );
+
+    return output.toString();
   }
 }

@@ -1,7 +1,10 @@
 /// Collection of predefined icons for CLI applications.
 ///
-/// Each icon has a visual symbol that can be used with logger methods
-/// or directly accessed via the `symbol` getter.
+/// Each icon represents a visual pictorial symbol that can be used with
+/// logger methods or directly accessed via the `symbol` getter.
+///
+/// For text-based CLI marks such as bullets, checks, arrows, and symbols,
+/// see [CliMarks].
 ///
 /// Example usage:
 /// ```dart
@@ -17,14 +20,11 @@ enum CliIcons {
   /// ❌ Error/failure icon
   error,
 
-  /// ⚠️  Warning/caution icon
+  /// ⚠️ Warning/caution icon
   warning,
 
-  /// ℹ️  Information icon
+  /// ℹ️ Information icon
   info,
-
-  /// ... Loading/progress icon
-  loading,
 
   /// 💡 Idea/tip/suggestion icon
   idea,
@@ -37,25 +37,10 @@ enum CliIcons {
   /// 📁 Directory/folder icon
   folder,
 
-  /// ⬇ Download/pull icon
-  download,
-
-  /// ⬆ Upload/push icon
-  upload,
-
   // Development and operations icons
 
   /// 🚀 Launch/rocket icon
   rocket,
-
-  /// ⚙ Configuration/settings icon
-  gear,
-
-  /// ★ Star/favorite icon
-  star,
-
-  /// ♥ Heart/like icon
-  heart,
 
   /// 🔨 Build/compile icon
   build,
@@ -66,51 +51,28 @@ enum CliIcons {
   /// 📦 Deploy/package icon
   deploy,
 
-  // Direction arrows
+  // Utility icons
 
-  /// → General arrow
-  arrow,
+  /// 🔍 Search/find icon
+  search,
 
-  /// ↑ Up arrow
-  arrowUp,
+  /// 🔒 Security/locked icon
+  lock,
 
-  /// ↓ Down arrow
-  arrowDown,
+  /// 🔑 Key/credentials icon
+  key,
 
-  /// ← Left arrow
-  arrowLeft,
+  /// 👤 User/account icon
+  user,
 
-  /// → Right arrow
-  arrowRight,
+  /// 🗄️ Database/storage icon
+  database,
 
-  // General symbols
+  /// 🔗 Link/connection icon
+  link,
 
-  /// • Bullet point
-  bullet,
-
-  /// ✓ Check mark
-  check,
-
-  /// ✗ Cross/cancel mark
-  cross,
-
-  /// + Plus symbol
-  plus,
-
-  /// - Minus symbol
-  minus,
-
-  /// ● Circle symbol
-  circle,
-
-  /// ■ Square symbol
-  square,
-
-  /// ℹ Text information mark
-  infoMark,
-
-  /// ⚠ Text warning mark
-  warningMark;
+  /// 🗑️ Delete/remove icon
+  trash;
 
   /// Returns the visual symbol for this icon.
   ///
@@ -118,71 +80,46 @@ enum CliIcons {
   /// ```dart
   /// print(CliIcons.success.symbol); // prints: ✅
   /// print(CliIcons.rocket.symbol);  // prints: 🚀
+  /// print(CliIcons.search.symbol);  // prints: 🔍
   /// ```
   String get symbol {
     switch (this) {
       case CliIcons.success:
-        return "✅";
+        return '✅';
       case CliIcons.error:
-        return "❌";
+        return '❌';
       case CliIcons.warning:
-        return "⚠️ ";
+        return '⚠️ ';
       case CliIcons.info:
-        return "ℹ️ ";
+        return 'ℹ️ ';
       case CliIcons.idea:
-        return "💡";
-      case CliIcons.loading:
-        return "...";
+        return '💡';
       case CliIcons.file:
-        return "📄";
+        return '📄';
       case CliIcons.folder:
-        return "📁";
-      case CliIcons.download:
-        return "⬇";
-      case CliIcons.upload:
-        return "⬆";
+        return '📁';
       case CliIcons.rocket:
-        return "🚀";
-      case CliIcons.gear:
-        return "⚙";
-      case CliIcons.star:
-        return "★";
-      case CliIcons.heart:
-        return "♥";
+        return '🚀';
       case CliIcons.build:
-        return "🔨";
+        return '🔨';
       case CliIcons.test:
-        return "🧪";
+        return '🧪';
       case CliIcons.deploy:
-        return "📦";
-      case CliIcons.arrow:
-        return "→";
-      case CliIcons.arrowUp:
-        return "↑";
-      case CliIcons.arrowDown:
-        return "↓";
-      case CliIcons.arrowLeft:
-        return "←";
-      case CliIcons.arrowRight:
-        return "→";
-      case CliIcons.bullet:
-        return "•";
-      case CliIcons.check:
-        return "✓";
-      case CliIcons.cross:
-        return "✗";
-      case CliIcons.plus:
-        return "+";
-      case CliIcons.minus:
-        return "−";
-      case CliIcons.circle:
-        return "●";
-      case CliIcons.square:
-        return "■";
-      case CliIcons.infoMark:
-        return "ⓘ";
-      case CliIcons.warningMark:
-        return "△";
+        return '📦';
+      case CliIcons.search:
+        return '🔍';
+      case CliIcons.lock:
+        return '🔒';
+      case CliIcons.key:
+        return '🔑';
+      case CliIcons.user:
+        return '👤';
+      case CliIcons.database:
+        return '🗄️';
+      case CliIcons.link:
+        return '🔗';
+      case CliIcons.trash:
+        return '🗑️';
     }
   }
 

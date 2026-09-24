@@ -1,47 +1,69 @@
 import 'package:clix/clix.dart';
 
-void main() async {
-  // 1. Input Prompt
+Future<void> main() async {
+  final logger = CliLogger();
+
+  logger.primary('Clix Prompts Demo');
+  logger.newLine();
+
+  // 1. Input
   final name = await Input(prompt: 'What is your name?').interact();
 
-  print('Hello, $name!');
+  logger.success('Hello, $name!');
+  logger.newLine();
 
-  // 2. Password Prompt (for security purposes)
+  // 2. Password
   await Password(prompt: 'Enter your password:').interact();
 
-  print('Password entered (hidden)');
+  logger.success('Password entered securely.');
+  logger.newLine();
 
-  // 3. Confirm Prompt
+  // 3. Confirm
   final confirmed = await Confirm(
     prompt: 'Do you want to continue?',
   ).interact();
 
-  print('Confirmation: ${confirmed ? "Yes" : "No"}');
+  if (!confirmed) {
+    logger.warn('Operation cancelled.');
+    return;
+  }
 
-  // 4. Number Prompt
+  logger.success('Continuing...');
+  logger.newLine();
+
+  // 4. Number
   final age = await Number(prompt: 'How old are you?').interact();
 
-  print('Age: $age');
+  logger.point('Age: $age');
+  logger.newLine();
 
-  // 5. Select Prompt
+  // 5. Select
+  final colors = ['Red', 'Green', 'Blue', 'Yellow'];
+
   final color = await Select(
     prompt: 'Choose your favorite color:',
-    options: ['Red', 'Green', 'Blue', 'Yellow'],
+    options: colors,
   ).interact();
 
-  print('Selected color: ${["Red", "Green", "Blue", "Yellow"][color]}');
+  logger.point('Selected color: ${colors[color]}');
+  logger.newLine();
 
-  // 6. Multi Select Prompt
-  final hobbies = await MultiSelect(
+  // 6. Multi Select
+  final hobbies = ['Reading', 'Sports', 'Music', 'Gaming'];
+
+  final selectedHobbies = await MultiSelect(
     prompt: 'Select your hobbies:',
-    options: ['Reading', 'Sports', 'Music', 'Gaming'],
+    options: hobbies,
   ).interact();
 
-  print(
-    'Selected hobbies: ${hobbies.map((i) => ["Reading", "Sports", "Music", "Gaming"][i]).toList()}',
-  );
+  final selectedHobbyNames = selectedHobbies
+      .map((index) => hobbies[index])
+      .toList();
 
-  // 7. Search Prompt
+  logger.point('Selected hobbies: $selectedHobbyNames');
+  logger.newLine();
+
+  // 7. Search
   final languages = [
     'Dart',
     'Python',
@@ -52,13 +74,14 @@ void main() async {
     'Go',
     'Swift',
   ];
-  final searchResult = await Search(
+
+  final language = await Search(
     prompt: 'Search for a programming language:',
     options: languages,
   ).interact();
 
-  print('Selected language: ${languages[searchResult]}');
+  logger.point('Selected language: ${languages[language]}');
+  logger.newLine();
 
-  print('\n💡 Pro tip: Check out live_package_search.dart example to see');
-  print('   Search prompt working with real pub.dev API data!');
+  logger.successMark('Prompt demo completed');
 }

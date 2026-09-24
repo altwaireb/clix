@@ -9,9 +9,12 @@ void main() {
   setUp(() {
     mockIO = MockIO();
     logger = CliLogger(io: mockIO);
+
+    Clix.configure(io: mockIO);
   });
 
   group('Spinner -', () {
+    tearDown(Clix.reset);
     group('Spinner Creation', () {
       test('should create spinner with default type', () {
         final spinner = Spinner('Test message');
@@ -42,8 +45,18 @@ void main() {
         expect(spinner, isA<Spinner>());
       });
 
-      test('should create spinner with logger', () {
-        final spinner = Spinner('Logger spinner', logger: logger);
+      test('should create spinner with custom IO', () {
+        final spinner = Spinner('Custom IO spinner', io: mockIO);
+
+        expect(spinner, isA<Spinner>());
+      });
+
+      test('should use the global theme when theme is not specified', () {
+        final customTheme = CliTheme(primary: CliStyle(color: CliColor.cyan));
+
+        Clix.useTheme(customTheme);
+
+        final spinner = Spinner('Global theme spinner', io: mockIO);
 
         expect(spinner, isA<Spinner>());
       });

@@ -7,12 +7,12 @@ import '../core/formatter/formatter.dart';
 import '../core/formatter/basic_formatter.dart';
 import '../core/style/theme.dart';
 import '../core/style/color.dart';
-import '../core/style/point_style.dart';
 import '../core/style/padding.dart';
 import '../core/style/spacing.dart';
 import '../core/style/hint_symbol.dart';
 import '../core/style/line_spacing.dart';
 import '../core/icons/cli_icons.dart';
+import '../core/icons/cli_marks.dart';
 import '../core/indentation/indent_level.dart';
 import '../core/indentation/tree_symbol.dart';
 import '../progress/progress.dart';
@@ -572,7 +572,7 @@ class CliLogger {
   }
 
   /// Print with warning background (yellow)
-  void onWarning(
+  void onWarn(
     String message, {
     IndentLevel indent = IndentLevel.none,
     CliColor textColor = CliColor.black,
@@ -698,7 +698,7 @@ class CliLogger {
   /// Print with a mark and custom colors
   void withMark(
     String message, {
-    required CliIcons mark,
+    required CliMarks mark,
     CliColor markColor = CliColor.white,
     CliColor color = CliColor.white,
     IndentLevel indent = IndentLevel.none,
@@ -717,7 +717,7 @@ class CliLogger {
   void successMark(String message, {IndentLevel indent = IndentLevel.none}) {
     withMark(
       message,
-      mark: CliIcons.check,
+      mark: CliMarks.check,
       markColor: CliColor.success,
       color: CliColor.white,
       indent: indent,
@@ -728,7 +728,7 @@ class CliLogger {
   void errorMark(String message, {IndentLevel indent = IndentLevel.none}) {
     withMark(
       message,
-      mark: CliIcons.cross,
+      mark: CliMarks.cross,
       markColor: CliColor.error,
       color: CliColor.white,
       indent: indent,
@@ -736,10 +736,10 @@ class CliLogger {
   }
 
   /// Print with a warning mark and message
-  void warningMark(String message, {IndentLevel indent = IndentLevel.none}) {
+  void warnMark(String message, {IndentLevel indent = IndentLevel.none}) {
     withMark(
       message,
-      mark: CliIcons.warningMark,
+      mark: CliMarks.warning,
       markColor: CliColor.warning,
       color: CliColor.white,
       indent: indent,
@@ -750,7 +750,7 @@ class CliLogger {
   void infoMark(String message, {IndentLevel indent = IndentLevel.none}) {
     withMark(
       message,
-      mark: CliIcons.infoMark,
+      mark: CliMarks.info,
       markColor: CliColor.info,
       color: CliColor.white,
       indent: indent,
@@ -761,7 +761,7 @@ class CliLogger {
   void plusMark(String message, {IndentLevel indent = IndentLevel.none}) {
     withMark(
       message,
-      mark: CliIcons.plus,
+      mark: CliMarks.plus,
       markColor: CliColor.white,
       color: CliColor.white,
       indent: indent,
@@ -772,7 +772,7 @@ class CliLogger {
   void minusMark(String message, {IndentLevel indent = IndentLevel.none}) {
     withMark(
       message,
-      mark: CliIcons.minus,
+      mark: CliMarks.minus,
       markColor: CliColor.white,
       color: CliColor.white,
       indent: indent,
@@ -783,7 +783,7 @@ class CliLogger {
   void tree(
     String message, {
     TreeSymbol symbol = TreeSymbol.root,
-    CliColor color = CliColor.primary,
+    CliColor color = CliColor.white,
   }) {
     final colorFunc = color;
     final formattedMessage = '${symbol.symbol}${formatter.format(message)}';
@@ -795,7 +795,7 @@ class CliLogger {
     String message, {
     required CliIcons icon,
     TreeSymbol symbol = TreeSymbol.root,
-    CliColor color = CliColor.primary,
+    CliColor color = CliColor.white,
   }) {
     final colorFunc = color;
     final formattedMessage =
@@ -806,30 +806,294 @@ class CliLogger {
   /// Print with bullet point for lists and enumeration
   void point(
     String message, {
-    PointStyle style = PointStyle.bullet,
-    CliColor color = CliColor.primary,
     IndentLevel indent = IndentLevel.none,
-    int spacing = 1,
+    CliMarks mark = CliMarks.bullet,
   }) {
-    final colorFunc = color;
-    final spacingStr = ' ' * spacing;
-    final indentedMessage =
-        '${indent.spacing}${style.symbol}$spacingStr${formatter.format(message)}';
-    io.writeln(colorFunc(indentedMessage));
+    withMark(
+      message,
+      mark: mark,
+      markColor: CliColor.white,
+      color: CliColor.white,
+      indent: indent,
+    );
+  }
+
+  void pointSuccess(String message, {IndentLevel indent = IndentLevel.none}) {
+    withMark(
+      message,
+      mark: CliMarks.bullet,
+      markColor: CliColor.success,
+      color: CliColor.success,
+      indent: indent,
+    );
+  }
+
+  void pointError(String message, {IndentLevel indent = IndentLevel.none}) {
+    withMark(
+      message,
+      mark: CliMarks.bullet,
+      markColor: CliColor.error,
+      color: CliColor.error,
+      indent: indent,
+    );
+  }
+
+  void pointWarn(String message, {IndentLevel indent = IndentLevel.none}) {
+    withMark(
+      message,
+      mark: CliMarks.bullet,
+      markColor: CliColor.warning,
+      color: CliColor.warning,
+      indent: indent,
+    );
+  }
+
+  void pointInfo(String message, {IndentLevel indent = IndentLevel.none}) {
+    withMark(
+      message,
+      mark: CliMarks.bullet,
+      markColor: CliColor.info,
+      color: CliColor.info,
+      indent: indent,
+    );
+  }
+
+  void pointPrimary(String message, {IndentLevel indent = IndentLevel.none}) {
+    withMark(
+      message,
+      mark: CliMarks.bullet,
+      markColor: CliColor.primary,
+      color: CliColor.primary,
+      indent: indent,
+    );
+  }
+
+  void pointSecondary(String message, {IndentLevel indent = IndentLevel.none}) {
+    withMark(
+      message,
+      mark: CliMarks.bullet,
+      markColor: CliColor.secondary,
+      color: CliColor.secondary,
+      indent: indent,
+    );
+  }
+
+  void pointGray(String message, {IndentLevel indent = IndentLevel.none}) {
+    withMark(
+      message,
+      mark: CliMarks.bullet,
+      markColor: CliColor.gray,
+      color: CliColor.gray,
+      indent: indent,
+    );
+  }
+
+  void pointArrow(String message, {IndentLevel indent = IndentLevel.none}) {
+    withMark(
+      message,
+      mark: CliMarks.arrow,
+      markColor: CliColor.gray,
+      color: CliColor.gray,
+      indent: indent,
+    );
+  }
+
+  void pointCustom(
+    String message, {
+    CliMarks mark = CliMarks.bullet,
+    CliColor markColor = CliColor.white,
+    CliColor color = CliColor.white,
+    IndentLevel indent = IndentLevel.none,
+  }) {
+    withMark(
+      message,
+      mark: mark,
+      markColor: markColor,
+      color: color,
+      indent: indent,
+    );
+  }
+
+  void pointWithHint(
+    String message, {
+    String hint = '',
+    CliMarks mark = CliMarks.bullet,
+    CliColor markColor = CliColor.white,
+    IndentLevel indent = IndentLevel.none,
+    CliColor color = CliColor.white,
+    CliColor hintColor = CliColor.gray,
+    Spacing spacing = Spacing.medium,
+    HintSymbol hintSymbol = HintSymbol.dot,
+  }) {
+    messageMarkWithHint(
+      message,
+      hint: hint,
+      mark: mark,
+      markColor: markColor,
+      indent: indent,
+      color: color,
+      hintColor: hintColor,
+      spacing: spacing,
+      hintSymbol: hintSymbol,
+    );
+  }
+
+  void pointSuccessWithHint(
+    String message, {
+    String hint = '',
+    CliMarks mark = CliMarks.bullet,
+    CliColor markColor = CliColor.success,
+    IndentLevel indent = IndentLevel.none,
+    CliColor color = CliColor.success,
+    CliColor hintColor = CliColor.gray,
+    Spacing spacing = Spacing.medium,
+    HintSymbol hintSymbol = HintSymbol.dot,
+  }) {
+    messageMarkWithHint(
+      message,
+      hint: hint,
+      mark: mark,
+      markColor: markColor,
+      indent: indent,
+      color: color,
+      hintColor: hintColor,
+      spacing: spacing,
+      hintSymbol: hintSymbol,
+    );
+  }
+
+  void pointErrorWithHint(
+    String message, {
+    String hint = '',
+    CliMarks mark = CliMarks.bullet,
+    CliColor markColor = CliColor.error,
+    IndentLevel indent = IndentLevel.none,
+    CliColor color = CliColor.error,
+    CliColor hintColor = CliColor.gray,
+    Spacing spacing = Spacing.medium,
+    HintSymbol hintSymbol = HintSymbol.dot,
+  }) {
+    messageMarkWithHint(
+      message,
+      hint: hint,
+      mark: mark,
+      markColor: markColor,
+      indent: indent,
+      color: color,
+      hintColor: hintColor,
+      spacing: spacing,
+      hintSymbol: hintSymbol,
+    );
+  }
+
+  void pointWarnWithHint(
+    String message, {
+    String hint = '',
+    CliMarks mark = CliMarks.bullet,
+    CliColor markColor = CliColor.warning,
+    IndentLevel indent = IndentLevel.none,
+    CliColor color = CliColor.warning,
+    CliColor hintColor = CliColor.gray,
+    Spacing spacing = Spacing.medium,
+    HintSymbol hintSymbol = HintSymbol.dot,
+  }) {
+    messageMarkWithHint(
+      message,
+      hint: hint,
+      mark: mark,
+      markColor: markColor,
+      indent: indent,
+      color: color,
+      hintColor: hintColor,
+      spacing: spacing,
+      hintSymbol: hintSymbol,
+    );
+  }
+
+  void pointInfoWithHint(
+    String message, {
+    String hint = '',
+    CliMarks mark = CliMarks.bullet,
+    CliColor markColor = CliColor.info,
+    IndentLevel indent = IndentLevel.none,
+    CliColor color = CliColor.info,
+    CliColor hintColor = CliColor.gray,
+    Spacing spacing = Spacing.medium,
+    HintSymbol hintSymbol = HintSymbol.dot,
+  }) {
+    messageMarkWithHint(
+      message,
+      hint: hint,
+      mark: mark,
+      markColor: markColor,
+      indent: indent,
+      color: color,
+      hintColor: hintColor,
+      spacing: spacing,
+      hintSymbol: hintSymbol,
+    );
+  }
+
+  void pointPrimaryWithHint(
+    String message, {
+    String hint = '',
+    CliMarks mark = CliMarks.bullet,
+    CliColor markColor = CliColor.primary,
+    IndentLevel indent = IndentLevel.none,
+    CliColor color = CliColor.primary,
+    CliColor hintColor = CliColor.gray,
+    Spacing spacing = Spacing.medium,
+    HintSymbol hintSymbol = HintSymbol.dot,
+  }) {
+    messageMarkWithHint(
+      message,
+      hint: hint,
+      mark: mark,
+      markColor: markColor,
+      indent: indent,
+      color: color,
+      hintColor: hintColor,
+      spacing: spacing,
+      hintSymbol: hintSymbol,
+    );
+  }
+
+  void pointSecondaryWithHint(
+    String message, {
+    String hint = '',
+    CliMarks mark = CliMarks.bullet,
+    CliColor markColor = CliColor.secondary,
+    IndentLevel indent = IndentLevel.none,
+    CliColor color = CliColor.secondary,
+    CliColor hintColor = CliColor.gray,
+    Spacing spacing = Spacing.medium,
+    HintSymbol hintSymbol = HintSymbol.dot,
+  }) {
+    messageMarkWithHint(
+      message,
+      hint: hint,
+      mark: mark,
+      markColor: markColor,
+      indent: indent,
+      color: color,
+      hintColor: hintColor,
+      spacing: spacing,
+      hintSymbol: hintSymbol,
+    );
   }
 
   /// Print with tree structure and bullet points
   void treePoint(
     String message, {
-    PointStyle style = PointStyle.bullet,
+    CliMarks mark = CliMarks.bullet,
     TreeSymbol symbol = TreeSymbol.level1,
-    CliColor color = CliColor.primary,
+    CliColor color = CliColor.white,
     int spacing = 1,
   }) {
     final colorFunc = color;
     final spacingStr = ' ' * spacing;
     final formattedMessage =
-        '${symbol.symbol}${style.symbol}$spacingStr${formatter.format(message)}';
+        '${symbol.symbol}${mark.symbol}$spacingStr${formatter.format(message)}';
     io.writeln(colorFunc(formattedMessage));
   }
 
@@ -1017,6 +1281,72 @@ class CliLogger {
     }
   }
 
+  /// **Message with Mark and Hint** - Display message with mark and hint
+  ///
+  /// Combines mark display with hint functionality for rich, informative messages.
+  /// Perfect for status updates with additional guidance or next steps.
+  ///
+  /// ```dart
+  /// logger.messageMarkWithHint(
+  ///   'Tests completed',
+  ///   hint: 'Coverage report: coverage/index.html',
+  ///   mark: CliMarks.check,
+  ///   markColor: CliColor.success,
+  ///   spacing: Spacing.large,
+  ///   hintSymbol: HintSymbol.info,
+  /// );
+  /// // Result: ✓ Tests completed      ℹ Coverage report: coverage/index.html
+  ///
+  /// logger.messageMarkWithHint(
+  ///   'Build failed',
+  ///   hint: 'Check build.log for details',
+  ///   mark: CliMarks.cross,
+  ///   markColor: CliColor.error,
+  ///   color: CliColor.error,
+  ///   hintSymbol: HintSymbol.arrow,
+  /// );
+  /// // Result: ✗ Build failed    → Check build.log for details
+  /// ```
+  ///
+  /// **Parameters:**
+  /// - `message`: Main message content
+  /// - `hint`: Additional hint or instruction (optional)
+  /// - `mark`: Mark to display before the message
+  /// - `markColor`: Color for the mark
+  /// - `indent`: Indentation level for the entire line
+  /// - `color`: Color for the main message
+  /// - `hintColor`: Color for the hint text
+  /// - `spacing`: Amount of space between message and hint
+  /// - `hintSymbol`: Symbol to prefix the hint
+  void messageMarkWithHint(
+    String message, {
+    String hint = '',
+    required CliMarks mark,
+    CliColor markColor = CliColor.white,
+    IndentLevel indent = IndentLevel.none,
+    CliColor color = CliColor.primary,
+    CliColor hintColor = CliColor.gray,
+    Spacing spacing = Spacing.medium,
+    HintSymbol hintSymbol = HintSymbol.dot,
+  }) {
+    final formattedMessage = formatter.format(message);
+
+    final coloredMark = markColor(mark.symbol);
+    final coloredMessage = color(formattedMessage);
+
+    final messageWithMark = '${indent.spacing}$coloredMark $coloredMessage';
+
+    if (hint.isEmpty) {
+      io.writeln(messageWithMark);
+      return;
+    }
+
+    final hintWithSymbol = hintSymbol.apply(hint);
+    final coloredHint = hintColor(hintWithSymbol);
+
+    io.writeln('$messageWithMark${spacing.gap}$coloredHint');
+  }
+
   /// Print multiple lines with specified log level
   void lines(
     List<String> messages, {
@@ -1155,6 +1485,47 @@ class CliLogger {
     );
   }
 
+  /// **Success Mark with Hint** - Success mark message with guidance
+  ///
+  /// Display successful operation with checkmark icon and helpful next steps.
+  /// Combines visual success indication with actionable guidance.
+  ///
+  /// ```dart
+  /// logger.successMarkWithHint(
+  ///   'Tests passed',
+  ///   hint: 'Coverage: 98% - See coverage/index.html',
+  ///   hintSymbol: HintSymbol.info,
+  /// );
+  /// // Result: ✓ Tests passed    ℹ Coverage: 98% - See coverage/index.html
+  ///
+  /// logger.successMarkWithHint(
+  ///   'Deployment complete',
+  ///   hint: 'Visit: https://app.example.com',
+  ///   spacing: Spacing.large,
+  /// );
+  /// // Result: ✓ Deployment complete      • Visit: https://app.example.com
+  /// ```
+  void successMarkWithHint(
+    String message, {
+    String hint = '',
+    IndentLevel indent = IndentLevel.none,
+    CliColor hintColor = CliColor.gray,
+    Spacing spacing = Spacing.medium,
+    HintSymbol hintSymbol = HintSymbol.dot,
+  }) {
+    messageMarkWithHint(
+      message,
+      hint: hint,
+      mark: CliMarks.check,
+      indent: indent,
+      markColor: CliColor.success,
+      color: CliColor.white,
+      hintColor: hintColor,
+      spacing: spacing,
+      hintSymbol: hintSymbol,
+    );
+  }
+
   /// **❌ Error with Hint** - Error message with troubleshooting guidance
   ///
   /// Display error messages with helpful troubleshooting hints or next steps.
@@ -1214,6 +1585,47 @@ class CliLogger {
       icon: CliIcons.error,
       indent: indent,
       color: CliColor.error,
+      hintColor: hintColor,
+      spacing: spacing,
+      hintSymbol: hintSymbol,
+    );
+  }
+
+  /// **Error Mark with Hint** - Error mark message with troubleshooting guidance
+  ///
+  /// Display error messages with helpful troubleshooting hints or next steps.
+  /// Perfect for providing actionable error recovery information.
+  ///
+  /// ```dart
+  /// logger.errorMarkWithHint(
+  ///   'Tests failed',
+  ///   hint: 'Coverage: 98% - See coverage/index.html',
+  ///   hintSymbol: HintSymbol.info,
+  /// );
+  /// // Result: ✗ Tests failed    ℹ Coverage: 98% - See coverage/index.html
+  ///
+  /// logger.errorMarkWithHint(
+  ///   'Deployment complete',
+  ///   hint: 'Visit: https://app.example.com',
+  ///   spacing: Spacing.large,
+  /// );
+  /// // Result: ✗ Deployment complete      • Visit: https://app.example.com
+  /// ```
+  void errorMarkWithHint(
+    String message, {
+    String hint = '',
+    IndentLevel indent = IndentLevel.none,
+    CliColor hintColor = CliColor.gray,
+    Spacing spacing = Spacing.medium,
+    HintSymbol hintSymbol = HintSymbol.dot,
+  }) {
+    messageMarkWithHint(
+      message,
+      hint: hint,
+      mark: CliMarks.cross,
+      indent: indent,
+      markColor: CliColor.error,
+      color: CliColor.white,
       hintColor: hintColor,
       spacing: spacing,
       hintSymbol: hintSymbol,
@@ -1285,6 +1697,40 @@ class CliLogger {
     );
   }
 
+  /// **Warning Mark with Hint** - Warning mark message with troubleshooting guidance
+  ///
+  /// Display warning messages with helpful troubleshooting hints or next steps.
+  /// Perfect for providing actionable warning recovery information.
+  ///
+  /// ```dart
+  /// logger.warnMarkWithHint(
+  ///   'Deprecated API used',
+  ///   hint: 'Migrate to v2 API - See docs.example.com/migration',
+  ///   spacing: Spacing.large,
+  /// );
+  /// // Result: △ Deprecated API used      • Migrate to v2 API - See docs.example.com/migration
+  /// ```
+  void warnMarkWithHint(
+    String message, {
+    String hint = '',
+    IndentLevel indent = IndentLevel.none,
+    CliColor hintColor = CliColor.gray,
+    Spacing spacing = Spacing.medium,
+    HintSymbol hintSymbol = HintSymbol.dot,
+  }) {
+    messageMarkWithHint(
+      message,
+      hint: hint,
+      mark: CliMarks.warning,
+      indent: indent,
+      markColor: CliColor.warning,
+      color: CliColor.white,
+      hintColor: hintColor,
+      spacing: spacing,
+      hintSymbol: hintSymbol,
+    );
+  }
+
   /// **ℹ️ Info with Hint** - Information message with additional context
   ///
   /// Display informational messages with helpful additional context.
@@ -1344,6 +1790,41 @@ class CliLogger {
       icon: CliIcons.info,
       indent: indent,
       color: CliColor.info,
+      hintColor: hintColor,
+      spacing: spacing,
+      hintSymbol: hintSymbol,
+    );
+  }
+
+  /// **Info Mark with Hint** - Info mark message with troubleshooting guidance
+  ///
+  /// Display info messages with helpful troubleshooting hints or next steps.
+  /// Perfect for providing actionable info recovery information.
+  ///
+  /// ```dart
+  /// logger.infoMarkWithHint(
+  ///   'Configuration loaded',
+  ///   hint: 'Edit config.yaml to customize settings',
+  ///   spacing: Spacing.large,
+  ///   hintSymbol: HintSymbol.arrow,
+  /// );
+  /// // Result: ⓘ Configuration loaded      → Edit config.yaml to customize settings
+  /// ```
+  void infoMarkWithHint(
+    String message, {
+    String hint = '',
+    IndentLevel indent = IndentLevel.none,
+    CliColor hintColor = CliColor.gray,
+    Spacing spacing = Spacing.medium,
+    HintSymbol hintSymbol = HintSymbol.dot,
+  }) {
+    messageMarkWithHint(
+      message,
+      hint: hint,
+      mark: CliMarks.info,
+      indent: indent,
+      markColor: CliColor.info,
+      color: CliColor.white,
       hintColor: hintColor,
       spacing: spacing,
       hintSymbol: hintSymbol,
@@ -1530,14 +2011,8 @@ class CliLogger {
     String message, {
     SpinnerType type = SpinnerType.dots,
     CliTheme? theme,
-    CliLogger? logger,
   }) {
-    return Spinner(
-      message,
-      type: type,
-      theme: theme ?? this.theme,
-      logger: logger ?? this,
-    );
+    return Spinner(message, type: type, theme: theme ?? this.theme, io: io);
   }
 
   /// Create a multi-spinner for managing multiple concurrent tasks
@@ -1560,8 +2035,8 @@ class CliLogger {
   /// ```
   ///
   /// For advanced customization, use [MultiSpinner] constructor directly.
-  MultiSpinner multiSpinner({CliTheme? theme, CliLogger? logger}) {
-    return MultiSpinner(theme: theme ?? this.theme, logger: logger ?? this);
+  MultiSpinner multiSpinner({CliTheme? theme}) {
+    return MultiSpinner(theme: theme ?? this.theme, io: io);
   }
 
   /// Create a formatted table with automatic theme inheritance

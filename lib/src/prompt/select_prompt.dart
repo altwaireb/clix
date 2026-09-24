@@ -1,114 +1,164 @@
-/// Selection Prompt - Interactive single-choice menu
-library;
-
-import 'dart:io';
 import 'prompt.dart';
+import 'cli_help_prompt_position.dart';
+import '../core/icons/cli_marks.dart';
 import '../core/io/cli_io.dart';
+import '../core/keyboard/cli_keyboard.dart';
 import '../core/style/theme.dart';
+import '../core/terminal/cli_terminal_control.dart';
 
-/// **Select Class - Single selection menu prompt**
-///
-/// Interactive menu allowing users to select one option from a list using arrow keys.
-/// Returns the index of the selected option for flexible result handling.
 class Select extends Prompt<int> {
-  /// **Prompt Text** - Instructions or question shown above menu
   final String prompt;
-
-  /// **Options List** - Available choices for selection
   final List<String> options;
-
-  /// **Default Index** - Initially selected option (0-based index)
   final int defaultIndex;
+  final bool help;
+  final CliHelpPromptPosition helpPosition;
+  final CliKeyboard keyboard;
 
-  /// **Constructor** - Create selection prompt with options
-  ///
-  /// ```dart
-  /// final select = Select(
-  ///   prompt: 'Choose option:',
-  ///   options: ['Option 1', 'Option 2', 'Option 3'],
-  ///   defaultIndex: 1, // Start with Option 2 selected
-  /// );
-  /// ```
-  Select({required this.prompt, required this.options, this.defaultIndex = 0});
+  Select({
+    required this.prompt,
+    required this.options,
+    this.defaultIndex = 0,
+    this.help = true,
+    this.helpPosition = CliHelpPromptPosition.bottom,
+    CliKeyboard? keyboard,
+  }) : keyboard = keyboard ?? CliKeyboard();
 
-  /// **Run Prompt** - Execute interactive selection
   @override
   Future<int> run(CliIO io, CliTheme theme) async {
+    if (options.isEmpty) {
+      throw StateError('Select requires at least one option.');
+    }
+
+    var selectedIndex = defaultIndex.clamp(0, options.length - 1);
+
+    CliTerminalControl.clearLine();
     io.writeln(theme.primary(prompt));
 
-    int selectedIndex = defaultIndex;
+    _renderOptions(io, theme, selectedIndex, confirmed: false);
 
-    // Enable raw mode for capturing arrow keys
-    stdin.echoMode = false;
-    stdin.lineMode = false;
+    keyboard.start();
 
     try {
       while (true) {
-        _renderOptions(io, theme, selectedIndex);
+        final key = keyboard.read();
 
-        final input = stdin.readByteSync();
+        if (key.isArrowUp) {
+          selectedIndex = (selectedIndex - 1 + options.length) % options.length;
 
-        if (input == 27) {
-          // Escape sequence (arrow keys)
-          final next1 = stdin.readByteSync();
-          final next2 = stdin.readByteSync();
+          _renderOptions(
+            io,
+            theme,
+            selectedIndex,
+            confirmed: false,
+            redraw: true,
+          );
+        } else if (key.isArrowDown) {
+          selectedIndex = (selectedIndex + 1) % options.length;
 
-          if (next1 == 91) {
-            if (next2 == 65) {
-              // Up arrow
-              selectedIndex =
-                  (selectedIndex - 1 + options.length) % options.length;
-            } else if (next2 == 66) {
-              // Down arrow
-              selectedIndex = (selectedIndex + 1) % options.length;
-            }
-          }
-        } else if (input == 10 || input == 13) {
-          // Enter key
-          _showConfirmation(io, theme, selectedIndex, options[selectedIndex]);
+          _renderOptions(
+            io,
+            theme,
+            selectedIndex,
+            confirmed: false,
+            redraw: true,
+          );
+        } else if (key.isEnter) {
+          _renderOptions(
+            io,
+            theme,
+            selectedIndex,
+            confirmed: true,
+            redraw: true,
+          );
+
           return selectedIndex;
         }
       }
     } finally {
-      stdin.echoMode = true;
-      stdin.lineMode = true;
+      keyboard.stop();
     }
   }
 
-  void _renderOptions(CliIO io, CliTheme theme, int selectedIndex) {
-    // Move cursor up to redraw options
-    io.write('\x1B[${options.length}A');
-
-    // Render options
-    for (int i = 0; i < options.length; i++) {
-      // Clear the line first
-      io.write('\x1B[2K');
-
-      final isSelected = i == selectedIndex;
-      final prefix = isSelected ? '❯' : ' ';
-      final option = options[i];
-
-      if (isSelected) {
-        io.writeln('  ${theme.primary(prefix)} ${theme.primary(option)}');
-      } else {
-        io.writeln('  $prefix $option');
-      }
-    }
-  }
-
-  void _showConfirmation(
+  void _renderOptions(
     CliIO io,
     CliTheme theme,
-    int selectedIndex,
-    String selectedOption,
-  ) {
-    // Move up to prompt line and clear everything below
-    io.write('\x1B[${options.length + 1}A\x1B[2K');
+    int selectedIndex, {
+    required bool confirmed,
+    bool redraw = false,
+  }) {
+    if (redraw) {
+      final lines = _renderedLines(confirmed: false);
 
-    final checkmark = theme.success('✓');
-    final question = theme.primary(prompt);
-    final answer = theme.plain(selectedOption);
+      CliTerminalControl.moveUp(lines);
+      CliTerminalControl.clearLines(lines);
+    }
 
-    io.writeln('$checkmark $question $answer');
+    if (_shouldRenderHelpAtTop(confirmed)) {
+      _renderHelp(io, theme);
+
+      CliTerminalControl.clearLine();
+      io.writeln('');
+    }
+
+    for (var i = 0; i < options.length; i++) {
+      CliTerminalControl.clearLine();
+
+      final isSelected = i == selectedIndex;
+      final option = options[i];
+
+      if (confirmed) {
+        if (isSelected) {
+          final mark = theme.success(CliMarks.check.symbol);
+          final text = theme.primary(option);
+
+          io.writeln('  $mark $text');
+        } else {
+          io.writeln('    ${theme.gray(option)}');
+        }
+      } else if (isSelected) {
+        final mark = theme.primary(CliMarks.pointer.symbol);
+        final text = theme.primary(option);
+
+        io.writeln('  $mark $text');
+      } else {
+        io.writeln('    ${theme.plain(option)}');
+      }
+    }
+
+    if (_shouldRenderHelpAtBottom(confirmed)) {
+      CliTerminalControl.clearLine();
+      io.writeln('');
+
+      _renderHelp(io, theme);
+    }
+  }
+
+  int _renderedLines({required bool confirmed}) {
+    if (confirmed || !help) {
+      return options.length;
+    }
+
+    return options.length + 2;
+  }
+
+  bool _shouldRenderHelpAtTop(bool confirmed) {
+    return help && !confirmed && helpPosition == CliHelpPromptPosition.top;
+  }
+
+  bool _shouldRenderHelpAtBottom(bool confirmed) {
+    return help && !confirmed && helpPosition == CliHelpPromptPosition.bottom;
+  }
+
+  void _renderHelp(CliIO io, CliTheme theme) {
+    CliTerminalControl.clearLine();
+
+    io.writeln(
+      theme.plain(
+        '${CliMarks.arrowUp.symbol}'
+        '${CliMarks.arrowDown.symbol} Navigate '
+        '${CliMarks.bullet.symbol} '
+        '${CliMarks.enter.symbol} Enter to confirm',
+      ),
+    );
   }
 }

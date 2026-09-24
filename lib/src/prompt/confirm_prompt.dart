@@ -4,6 +4,7 @@ library;
 import 'prompt.dart';
 import '../core/io/cli_io.dart';
 import '../core/style/theme.dart';
+import '../core/terminal/cli_terminal_control.dart';
 
 /// **Confirm Class - Yes/No confirmation prompt**
 ///
@@ -44,7 +45,7 @@ class Confirm extends Prompt<bool> {
       promptText = '$promptText (y/n)';
     }
 
-    io.write('$promptText: ');
+    io.write('$promptText ');
     final input = io.readLine().trim().toLowerCase();
 
     // Handle empty input with default
@@ -63,7 +64,8 @@ class Confirm extends Prompt<bool> {
 
   void _showConfirmation(CliIO io, CliTheme theme, bool result) {
     // Clear the input line and show confirmation
-    io.write('\x1B[1A\x1B[2K'); // Move up and clear line
+    CliTerminalControl.moveUp();
+    CliTerminalControl.clearLine();
 
     final checkmark = theme.success('✓');
     final question = theme.primary(prompt);

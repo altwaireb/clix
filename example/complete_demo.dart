@@ -53,8 +53,14 @@ Future<void> main() async {
   logger.point('Main item');
   logger.point('Sub item', indent: IndentLevel.level1);
   logger.point('Sub-sub item', indent: IndentLevel.level2);
-  logger.point('Check item', style: PointStyle.check, color: CliColor.green);
-  logger.point('Arrow item', style: PointStyle.arrow, color: CliColor.yellow);
+  logger.pointArrow('Arrow item', indent: IndentLevel.level2);
+  logger.pointCustom(
+    'Check item',
+    mark: CliMarks.check,
+    markColor: CliColor.white,
+    color: CliColor.green,
+    indent: IndentLevel.level2,
+  );
 
   logger.newLine();
 
@@ -109,7 +115,7 @@ Future<void> main() async {
 
   // === SPINNER DEMO ===
   logger.info('Animation demo:');
-  final spinner = Spinner('Processing...', logger: logger);
+  final spinner = Spinner('Processing...');
   await Future.delayed(Duration(seconds: 2));
   spinner.complete('Processing completed!');
 
@@ -166,8 +172,8 @@ Future<void> main() async {
   logger.newLine();
 
   // === COMPLETION ===
-  logger.withIcon('Demo completed successfully!', icon: CliIcons.check);
+  logger.withIcon('Demo completed successfully!', icon: CliIcons.deploy);
   logger.info('This demo shows all major Clix features in one place.');
   logger.newLine();
-  logger.successIcon('Ready to build amazing CLI apps! 🚀');
+  logger.successIcon('Ready to build amazing CLI apps!');
 }

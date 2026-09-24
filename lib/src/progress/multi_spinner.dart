@@ -1,11 +1,12 @@
 import 'dart:async';
-import 'dart:io';
-import '../logger/logger.dart';
-import '../core/style/color.dart';
-import '../core/style/theme.dart';
+
+import '../core/context/cli_context.dart';
 import '../core/icons/cli_icons.dart';
-import 'enums/task_status.dart';
+import '../core/icons/cli_marks.dart';
+import '../core/io/cli_io.dart';
+import '../core/style/theme.dart';
 import 'enums/spinner_type.dart';
+import 'enums/task_status.dart';
 
 /// Individual task in MultiSpinner
 class SpinnerTask {
@@ -33,7 +34,7 @@ class SpinnerTask {
 
 /// MultiSpinner for managing multiple concurrent tasks
 class MultiSpinner {
-  final CliLogger? _logger;
+  final CliIO _io;
   final Duration _interval;
   final SpinnerType _type;
   final CliTheme _theme;
@@ -44,12 +45,12 @@ class MultiSpinner {
   bool _isActive = false;
 
   MultiSpinner({
-    CliLogger? logger,
     CliTheme? theme,
+    CliIO? io,
     Duration interval = const Duration(milliseconds: 100),
     SpinnerType type = SpinnerType.dots,
-  }) : _logger = logger,
-       _theme = theme ?? CliTheme.defaultTheme(),
+  }) : _theme = theme ?? CliContext.theme,
+       _io = io ?? CliContext.io,
        _interval = interval,
        _type = type;
 
@@ -171,19 +172,14 @@ class MultiSpinner {
 
     // Show final message if provided
     if (finalMessage != null) {
-      stdout.write('\n'); // Add newline for better separation
-      if (_logger != null) {
-        if (withIcon) {
-          _logger.withIcon(finalMessage, icon: icon, color: CliColor.green);
-        } else {
-          _logger.success(finalMessage);
-        }
+      _io.write('\n');
+
+      if (withIcon) {
+        final styledIcon = _theme.success(icon.symbol);
+        _io.writeln('$styledIcon $finalMessage');
       } else {
-        if (withIcon) {
-          stdout.writeln('${CliColor.green(icon.symbol)} $finalMessage');
-        } else {
-          stdout.writeln('${CliColor.green('✓')} $finalMessage');
-        }
+        final checkmark = _theme.success(CliMarks.check.symbol);
+        _io.writeln('$checkmark $finalMessage');
       }
     }
   }
@@ -205,7 +201,7 @@ class MultiSpinner {
     _frameIndex = 0;
 
     // Hide cursor
-    stdout.write('\u001b[?25l');
+    _io.write('\u001b[?25l');
 
     _timer = Timer.periodic(_interval, (timer) => _render());
   }
@@ -219,7 +215,7 @@ class MultiSpinner {
     _isActive = false;
 
     // Show cursor
-    stdout.write('\u001b[?25h');
+    _io.write('\u001b[?25h');
   }
 
   /// Render current state
@@ -229,7 +225,7 @@ class MultiSpinner {
     // Move cursor up to beginning of our block
     final lineCount = _tasks.length;
     if (lineCount > 1) {
-      stdout.write('\u001b[${lineCount - 1}A');
+      _io.write('\u001b[${lineCount - 1}A');
     }
 
     // Render each task
@@ -238,7 +234,7 @@ class MultiSpinner {
       _renderTask(task);
 
       if (i < _tasks.length - 1) {
-        stdout.write('\n');
+        _io.write('\n');
       }
     }
 
@@ -252,7 +248,7 @@ class MultiSpinner {
     // Move cursor up to beginning of our block
     final lineCount = _tasks.length;
     if (lineCount > 1) {
-      stdout.write('\u001b[${lineCount - 1}A');
+      _io.write('\u001b[${lineCount - 1}A');
     }
 
     // Render each task (all should be completed now)
@@ -261,43 +257,40 @@ class MultiSpinner {
       _renderTask(task);
 
       if (i < _tasks.length - 1) {
-        stdout.write('\n');
+        _io.write('\n');
       }
     }
   }
 
   /// Render individual task
   void _renderTask(SpinnerTask task) {
-    stdout.write('\r\u001b[2K'); // Clear line
+    _io.write('\r\u001b[2K');
 
-    String icon;
-    CliColor colorFunction;
+    String styledIcon;
 
     switch (task.status) {
       case TaskStatus.pending:
-        icon = '⏳';
-        colorFunction = CliColor.gray;
+        styledIcon = _theme.gray('⏳');
         break;
+
       case TaskStatus.running:
-        icon = _frames[_frameIndex];
-        colorFunction = _theme.primaryColor; // استخدام primary color!
+        styledIcon = _theme.primary(_frames[_frameIndex]);
         break;
+
       case TaskStatus.completed:
-        icon = '✓';
-        colorFunction = CliColor.green;
+        styledIcon = _theme.success(CliMarks.check.symbol);
         break;
+
       case TaskStatus.failed:
-        icon = '✗';
-        colorFunction = CliColor.red;
+        styledIcon = _theme.error(CliMarks.cross.symbol);
         break;
     }
 
-    final coloredIcon = colorFunction(icon);
     final elapsed = task.elapsed.isNotEmpty
-        ? ' ${CliColor.gray(task.elapsed)}'
+        ? ' ${_theme.gray(task.elapsed)}'
         : '';
 
-    stdout.write('$coloredIcon ${task.message}$elapsed');
+    _io.write('$styledIcon ${task.message}$elapsed');
   }
 
   /// Check if all tasks are finished

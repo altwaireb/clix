@@ -9,9 +9,12 @@ void main() {
   setUp(() {
     mockIO = MockIO();
     logger = CliLogger(io: mockIO);
+
+    Clix.configure(io: mockIO);
   });
 
   group('Progress -', () {
+    tearDown(Clix.reset);
     group('Progress Creation', () {
       test('should create progress with required total', () {
         final progress = Progress(total: 100, io: mockIO);
@@ -50,6 +53,24 @@ void main() {
         expect(progress.width, equals(40));
         expect(progress.style, equals(ProgressStyle.basic));
         expect(progress.theme, isNotNull);
+      });
+
+      test('should use the global theme when theme is not specified', () {
+        final customTheme = CliTheme(primary: CliStyle(color: CliColor.cyan));
+
+        Clix.useTheme(customTheme);
+
+        final progress = Progress(total: 100, io: mockIO);
+
+        expect(progress.theme, same(customTheme));
+      });
+
+      test('should use the global IO when io is not specified', () {
+        Clix.configure(io: mockIO);
+
+        final progress = Progress(total: 100);
+
+        expect(progress.io, same(mockIO));
       });
     });
 

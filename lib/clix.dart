@@ -34,7 +34,9 @@ library;
 
 // Core imports for Clix class functionality
 import 'src/core/io/console_io.dart';
+import 'src/core/io/cli_io.dart';
 import 'src/core/style/theme.dart';
+import 'src/core/context/cli_context.dart';
 import 'src/logger/logger.dart';
 
 ///
@@ -47,7 +49,7 @@ import 'src/logger/logger.dart';
 export 'src/logger/logger.dart';
 export 'src/logger/log_level.dart';
 
-/// ### 🔌 **IO & Core Infrastructure**
+/// ### **IO & Core Infrastructure**
 /// - [CliIO] - Abstract IO interface for testing and flexibility
 /// - [ConsoleIO] - Real console implementation for production use
 
@@ -58,14 +60,12 @@ export 'src/core/io/console_io.dart';
 /// - [CliStyle] - Text styling with colors and formatting
 /// - [CliColor] - Comprehensive color system (25+ colors + hex)
 /// - [CliTheme] - Consistent theming across components
-/// - [PointStyle] - List and bullet point styles
 /// - [Padding] - Layout and spacing control
 /// - [LineSpacing] - Line height and vertical spacing
 
 export 'src/core/style/style.dart';
 export 'src/core/style/color.dart';
 export 'src/core/style/theme.dart';
-export 'src/core/style/point_style.dart';
 export 'src/core/style/padding.dart';
 export 'src/core/style/spacing.dart';
 export 'src/core/style/hint_symbol.dart';
@@ -73,8 +73,10 @@ export 'src/core/style/line_spacing.dart';
 
 /// ### **Icons & Visual Elements**
 /// - [CliIcons] - Ready-to-use CLI icons and symbols
+/// - [CliMarks] - Text-based CLI marks and symbols
 
 export 'src/core/icons/cli_icons.dart';
+export 'src/core/icons/cli_marks.dart';
 
 /// ### **Layout & Structure**
 /// - [IndentLevel] - Hierarchical indentation control
@@ -100,6 +102,7 @@ export 'src/core/formatter/basic_formatter.dart';
 /// - [SearchPrompt] - Searchable selection prompt
 /// - [MultiSelectPrompt] - Multiple selection from list
 /// - [PasswordPrompt] - Hidden password input
+/// - [CliHelpPromptPosition] - Help prompt position
 
 export 'src/prompt/prompt.dart';
 export 'src/prompt/input_prompt.dart';
@@ -110,6 +113,7 @@ export 'src/prompt/decimal_prompt.dart';
 export 'src/prompt/search_prompt.dart';
 export 'src/prompt/multi_select_prompt.dart';
 export 'src/prompt/password_prompt.dart';
+export 'src/prompt/cli_help_prompt_position.dart';
 
 /// ### **Input Validation**
 /// - [Validator] - Static validation methods for common patterns
@@ -140,31 +144,80 @@ export 'src/progress/enums/task_status.dart';
 export 'src/table/table.dart';
 export 'src/table/enums/table_alignment.dart';
 
-/// ### 🧪 **Testing Utilities**
+/// ### **Testing Utilities**
 /// - [CliTestResult] - Test execution results and reporting
 /// - [CliTestRunner] - CLI application testing framework
 
 export 'src/testing/cli_test_result.dart';
 export 'src/testing/cli_test_runner.dart';
 
-/// ### **Configuration & Arguments**
-/// - [CliArgs] - Command-line argument parsing and validation
+/// ### **Command-Line Arguments**
+/// - [CliParser] - Command-line argument parser
+/// - [CliOption] - Command-line option definition
+/// - [CliArgResults] - Parsed command-line results
+/// - [CliArgParserException] - Argument parsing exception
+/// - [CliUsageException] - Usage-related exception
+/// - [CliCommandRunner] - Command and subcommand runner
+/// - [CliHelpCommand] - Built-in help command
+/// - [CliUsage] - Usage generation and formatting
+/// - [CliAllowAnythingParser] - Parser that allows unknown arguments
+
+export 'src/args/cli_parser.dart';
+export 'src/args/cli_option.dart';
+export 'src/args/cli_arg_results.dart';
+export 'src/args/cli_arg_parser_exception.dart';
+export 'src/args/cli_usage_exception.dart';
+export 'src/args/cli_command_runner.dart';
+export 'src/args/cli_help_command.dart';
+export 'src/args/cli_usage.dart';
+export 'src/args/cli_allow_anything_parser.dart';
+
+/// ### **Configuration & Exceptions**
 /// - [CliConfig] - Application configuration management
 /// - [CliException] - Standardized error handling
 
-export 'src/args/args.dart';
 export 'src/config/cli_config.dart';
 export 'src/exceptions/exceptions.dart';
 
-// Re-export essential args types for convenience
-export 'package:args/args.dart' show ArgParser, ArgResults, ArgParserException;
+/// ### **Terminal**
+/// - [CliTerminal] - Terminal abstraction
+/// - [CliTerminalInput] - Terminal input interface
+/// - [CliTerminalOutput] - Terminal output interface
+/// - [CliTerminalContext] - Current terminal context
+/// - [CliTerminalControl] - Terminal screen and cursor controls
+/// - [CliTerminalInfo] - Terminal capabilities and dimensions
+/// - [CliTerminalSize] - Terminal dimensions
+/// - [CliTerminalState] - Terminal input state snapshot
+
+export 'src/core/terminal/cli_terminal.dart';
+export 'src/core/terminal/cli_terminal_context.dart';
+export 'src/core/terminal/cli_terminal_control.dart';
+export 'src/core/terminal/cli_terminal_info.dart';
+export 'src/core/terminal/cli_terminal_state.dart';
+
+/// ### **Keyboard**
+/// - [CliKeyboard] - Cross-platform keyboard input
+/// - [CliKey] - Normalized keyboard key
+/// - [CliKeyType] - Keyboard key types
+/// - [CliKeyModifier] - Logical keyboard modifiers
+/// - [CliKeyEvent] - Normalized keyboard event
+/// - [CliKeyEventType] - Keyboard event transition type
+/// - [CliKeyModifierKey] - Physical modifier keys
+/// - [CliKeyState] - Physical and logical keyboard state
+
+export 'src/core/keyboard/cli_keyboard.dart';
+export 'src/core/keyboard/cli_key.dart';
+export 'src/core/keyboard/cli_key_event.dart';
+export 'src/core/keyboard/cli_key_modifier.dart';
+export 'src/core/keyboard/cli_key_state.dart';
+export 'src/core/keyboard/cli_key_type.dart';
 
 /// **Main Clix class - Global access point for CLI operations**
 ///
 /// Provides static access to core Clix functionality including:
-/// - Pre-configured IO operations
-/// - Theme management and styling
-/// - Ready-to-use logger instance
+/// - Global IO operations
+/// - Global theme management
+/// - Ready-to-use logger
 ///
 /// ## Usage Examples:
 /// ```dart
@@ -182,19 +235,46 @@ export 'package:args/args.dart' show ArgParser, ArgResults, ArgParserException;
 /// Clix.io.write('Hello World!');
 /// ```
 class Clix {
-  /// **IO Operations** - Direct console input/output access
-  static final io = ConsoleIO();
-
-  /// **Active Theme** - Current styling theme for all components
-  static CliTheme theme = CliTheme.defaultTheme();
-
-  /// **Logger Instance** - Pre-configured logger with current theme
-  static final logger = CliLogger(theme: theme);
-
-  /// **Set Global Theme** - Apply theme to all Clix components
+  /// **IO Operations** - Current global console input/output.
   ///
-  /// Updates the global theme used by all Clix components.
-  /// Affects colors, styling, and visual appearance across the library.
+  /// Uses the IO configured in [CliContext].
+  static CliIO get io => CliContext.io;
+
+  /// **Active Theme** - Current global styling theme.
+  ///
+  /// Uses the theme configured in [CliContext].
+  static CliTheme get theme => CliContext.theme;
+
+  /// **Logger Instance** - Logger configured with the current global
+  /// IO and theme.
+  ///
+  /// A new logger is created from the current [CliContext] whenever
+  /// this getter is accessed, ensuring that it always uses the latest
+  /// configuration.
+  static CliLogger get logger {
+    return CliLogger(io: CliContext.io, theme: CliContext.theme);
+  }
+
+  /// **Configure Global Clix Context**
+  ///
+  /// Updates the global IO and/or theme used by Clix components.
+  ///
+  /// Only the values provided are changed.
+  ///
+  /// ```dart
+  /// Clix.configure(
+  ///   io: myIO,
+  ///   theme: myTheme,
+  /// );
+  /// ```
+  static void configure({CliIO? io, CliTheme? theme}) {
+    CliContext.configure(io: io, theme: theme);
+  }
+
+  /// **Set Global Theme** - Apply a custom theme to all Clix components.
+  ///
+  /// Updates the global theme used by Clix components that do not provide
+  /// an explicit theme.
   ///
   /// ```dart
   /// final darkTheme = CliTheme(
@@ -204,6 +284,13 @@ class Clix {
   /// Clix.useTheme(darkTheme);
   /// ```
   static void useTheme(CliTheme newTheme) {
-    theme = newTheme;
+    CliContext.configure(theme: newTheme);
+  }
+
+  /// **Reset Global Configuration** - Restore Clix defaults.
+  ///
+  /// Resets the global IO and theme to their default values.
+  static void reset() {
+    CliContext.reset();
   }
 }

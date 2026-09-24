@@ -9,9 +9,12 @@ void main() {
   setUp(() {
     mockIO = MockIO();
     logger = CliLogger(io: mockIO);
+
+    Clix.configure(io: mockIO);
   });
 
   group('MultiSpinner -', () {
+    tearDown(Clix.reset);
     group('MultiSpinner Creation', () {
       test('should create multi-spinner with defaults', () {
         final multiSpinner = MultiSpinner();
@@ -41,10 +44,10 @@ void main() {
         expect(multiSpinner, isA<MultiSpinner>());
       });
 
-      test('should create multi-spinner with logger', () {
-        final multiSpinner = MultiSpinner(logger: logger);
+      test('should create multi spinner with custom IO', () {
+        final spinner = MultiSpinner(io: mockIO);
 
-        expect(multiSpinner, isA<MultiSpinner>());
+        expect(spinner, isA<MultiSpinner>());
       });
     });
 

@@ -1,6 +1,8 @@
 import 'prompt.dart';
+import '../core/icons/cli_marks.dart';
 import '../core/io/cli_io.dart';
 import '../core/style/theme.dart';
+import '../core/terminal/cli_terminal_control.dart';
 
 class Number extends Prompt<int> {
   final String prompt;
@@ -14,19 +16,20 @@ class Number extends Prompt<int> {
   Future<int> run(CliIO io, CliTheme theme) async {
     while (true) {
       var promptText = theme.primary(prompt);
+
       if (min != null || max != null) {
         final range = 'Range: ${min ?? '-∞'} to ${max ?? '∞'}';
         promptText = '$promptText ($range)';
       }
+
       if (defaultValue != null) {
         promptText = '$promptText [$defaultValue]';
       }
 
-      io.write('$promptText: ');
+      io.write('$promptText ');
       final input = io.readLine().trim();
 
       if (input.isEmpty && defaultValue != null) {
-        // Show confirmation for default value
         _showConfirmation(io, theme, defaultValue!);
         return defaultValue!;
       }
@@ -48,21 +51,20 @@ class Number extends Prompt<int> {
         continue;
       }
 
-      // Show confirmation
       _showConfirmation(io, theme, value);
       return value;
     }
   }
 
   void _showConfirmation(CliIO io, CliTheme theme, int result) {
-    // Clear the input line and show confirmation
-    io.write('\x1B[1A\x1B[2K'); // Move up and clear line
+    CliTerminalControl.moveUp();
+    CliTerminalControl.clearLine();
 
-    final checkmark = theme.success('✓');
+    final checkmark = theme.success(CliMarks.check.symbol);
     final question = theme.primary(prompt);
     final answer = theme.plain(result.toString());
 
     io.writeln('$checkmark $question $answer');
-    io.writeln(''); // Add extra line to prevent deletion by next output
+    io.writeln('');
   }
 }

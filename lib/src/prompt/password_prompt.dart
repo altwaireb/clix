@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'prompt.dart';
 import '../core/io/cli_io.dart';
 import '../core/style/theme.dart';
@@ -31,7 +30,7 @@ class Password extends Prompt<String> {
         final error = validator!(password);
         if (error != null) {
           io.writeln(theme.error(error));
-          continue; // Ask for password again
+          continue;
         }
       }
 
@@ -39,12 +38,13 @@ class Password extends Prompt<String> {
       if (confirmation) {
         final confirmMsg =
             confirmPrompt ?? 'Confirm ${prompt.replaceAll(':', '')}';
+
         final confirmPassword = await _promptPassword(io, theme, confirmMsg);
 
         if (password != confirmPassword) {
           final error = confirmError ?? 'Passwords do not match';
           io.writeln(theme.error(error));
-          continue; // Ask for both passwords again
+          continue;
         }
       }
 
@@ -52,48 +52,18 @@ class Password extends Prompt<String> {
     }
   }
 
-  /// Helper method to prompt for a single password
+  /// Helper method to prompt for a single password.
   Future<String> _promptPassword(
     CliIO io,
     CliTheme theme,
     String promptMessage,
   ) async {
-    io.write('${theme.primary(promptMessage)}: ');
+    io.write('${theme.primary(promptMessage)} ');
 
-    // Save the terminal settings
-    stdin.echoMode = false;
-    stdin.lineMode = false;
-
-    final password = StringBuffer();
-
-    try {
-      while (true) {
-        final char = stdin.readByteSync();
-
-        if (char == 10 || char == 13) {
-          // Enter key
-          break;
-        } else if (char == 127 || char == 8) {
-          // Backspace
-          if (password.isNotEmpty) {
-            final temp = password.toString();
-            password.clear();
-            password.write(temp.substring(0, temp.length - 1));
-          }
-        } else if (char >= 32 && char <= 126) {
-          // Printable characters
-          password.writeCharCode(char);
-        }
-      }
-    } finally {
-      // Restore terminal settings
-      stdin.echoMode = true;
-      stdin.lineMode = true;
-    }
+    final password = io.read(mode: CliInputMode.hidden);
 
     io.writeln('');
 
-    final result = password.toString();
-    return result.isEmpty && defaultValue != null ? defaultValue! : result;
+    return password.isEmpty && defaultValue != null ? defaultValue! : password;
   }
 }

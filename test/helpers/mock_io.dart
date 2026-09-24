@@ -54,6 +54,18 @@ class MockIO implements CliIO {
     if (_inputIndex < _inputs.length) {
       return _inputs[_inputIndex++];
     }
+
+    throw StateError(
+      'No more inputs available. Add more inputs with addInput()',
+    );
+  }
+
+  @override
+  String read({CliInputMode mode = CliInputMode.line}) {
+    if (_inputIndex < _inputs.length) {
+      return _inputs[_inputIndex++];
+    }
+
     throw StateError(
       'No more inputs available. Add more inputs with addInput()',
     );

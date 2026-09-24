@@ -2,10 +2,11 @@
 library;
 
 import 'dart:async';
-import 'dart:io';
-import '../logger/logger.dart';
-import '../core/style/color.dart';
+
+import '../core/context/cli_context.dart';
+import '../core/io/cli_io.dart';
 import '../core/style/theme.dart';
+import '../core/icons/cli_marks.dart';
 import 'enums/spinner_type.dart';
 
 /// **Spinner Class - Animated loading indicator**
@@ -16,14 +17,14 @@ class Spinner {
   /// **Animation Type** - Visual style of the spinner animation
   final SpinnerType _type;
 
-  /// **Logger Instance** - Optional logger for final status messages
-  final CliLogger? _logger;
-
   /// **Animation Interval** - Time between animation frames
   final Duration _interval;
 
   /// **Theme** - Color scheme for spinner styling
   final CliTheme _theme;
+
+  /// **IO Interface** - Output operations for spinner display
+  final CliIO _io;
 
   /// **Animation Timer** - Controls the spinning animation
   Timer? _timer;
@@ -49,23 +50,23 @@ class Spinner {
   /// // Custom spinner
   /// final spinner = Spinner(
   ///   'Processing data...',
-  ///   type: SpinnerType.arrows,
-  ///   logger: myLogger,
-  ///   theme: CliTheme.blue(),
+  ///   type: SpinnerType.arrow,
+  ///   theme: myTheme,
+  ///   io: myIO,
   /// );
   /// ```
   Spinner(
     String message, {
     SpinnerType type = SpinnerType.dots,
-    CliLogger? logger,
     CliTheme? theme,
+    CliIO? io,
     Duration interval = const Duration(milliseconds: 100),
   }) : _type = type,
-       _logger = logger,
-       _theme = theme ?? CliTheme.defaultTheme(),
+       _theme = theme ?? CliContext.theme,
+       _io = io ?? CliContext.io,
        _interval = interval,
        _currentMessage = message {
-    start(); // Auto-start
+    start();
   }
 
   /// Get animated symbol frames
@@ -73,10 +74,13 @@ class Spinner {
     switch (_type) {
       case SpinnerType.dots:
         return ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+
       case SpinnerType.line:
         return ['-', '\\', '|', '/'];
+
       case SpinnerType.pipe:
         return ['┤', '┘', '┴', '└', '├', '┌', '┬', '┐'];
+
       case SpinnerType.clock:
         return [
           '🕛',
@@ -92,12 +96,16 @@ class Spinner {
           '🕔',
           '🕠',
         ];
+
       case SpinnerType.arrow:
         return ['←', '↖', '↑', '↗', '→', '↘', '↓', '↙'];
+
       case SpinnerType.triangle:
         return ['◢', '◣', '◤', '◥'];
+
       case SpinnerType.square:
         return ['■', '□', '▪', '▫'];
+
       case SpinnerType.circle:
         return ['◐', '◓', '◑', '◒'];
     }
@@ -111,10 +119,8 @@ class Spinner {
     _startTime = DateTime.now();
     _frameIndex = 0;
 
-    // Hide cursor
-    stdout.write('\u001b[?25l');
+    _io.write('\u001b[?25l');
 
-    // Show first frame immediately
     _showFrame();
 
     _timer = Timer.periodic(_interval, (timer) => _showFrame());
@@ -130,15 +136,13 @@ class Spinner {
     if (!_isActive) return;
 
     stop();
+
     final successMessage = message ?? _currentMessage;
     final elapsed = _formatElapsed();
+    final checkmark = _theme.success(CliMarks.check.symbol);
 
-    stdout.write('${_clearLine()}\r');
-    if (_logger != null) {
-      _logger.success('✓ $successMessage $elapsed');
-    } else {
-      stdout.writeln('${CliColor.green('✓')} $successMessage $elapsed');
-    }
+    _io.write('${_clearLine()}\r');
+    _io.writeln('$checkmark $successMessage $elapsed');
   }
 
   /// Complete spinner with failure
@@ -146,14 +150,12 @@ class Spinner {
     if (!_isActive) return;
 
     stop();
-    final failMessage = message ?? _currentMessage;
 
-    stdout.write('${_clearLine()}\r');
-    if (_logger != null) {
-      _logger.error('✗ $failMessage');
-    } else {
-      stdout.writeln('${CliColor.red('✗')} $failMessage');
-    }
+    final failMessage = message ?? _currentMessage;
+    final cross = _theme.error(CliMarks.cross.symbol);
+
+    _io.write('${_clearLine()}\r');
+    _io.writeln('$cross $failMessage');
   }
 
   /// Cancel spinner and hide line
@@ -161,7 +163,7 @@ class Spinner {
     if (!_isActive) return;
 
     stop();
-    stdout.write('${_clearLine()}\r');
+    _io.write('${_clearLine()}\r');
   }
 
   /// Stop spinner
@@ -172,8 +174,7 @@ class Spinner {
     _timer = null;
     _isActive = false;
 
-    // Show cursor
-    stdout.write('\u001b[?25h');
+    _io.write('\u001b[?25h');
 
     _cleanup();
   }
@@ -185,9 +186,8 @@ class Spinner {
     final frame = _frames[_frameIndex];
     final elapsed = _formatElapsed();
 
-    // Clear line and show spinner
-    stdout.write('\r${_clearLine()}');
-    stdout.write('\r${_theme.primaryColor(frame)} $_currentMessage $elapsed');
+    _io.write('\r${_clearLine()}');
+    _io.write('\r${_theme.primary(frame)} $_currentMessage $elapsed');
 
     _frameIndex = (_frameIndex + 1) % _frames.length;
   }
@@ -198,16 +198,15 @@ class Spinner {
 
     final elapsed = DateTime.now().difference(_startTime!);
     final seconds = elapsed.inMilliseconds / 1000;
-    return CliColor.gray('(${seconds.toStringAsFixed(1)}s)');
+
+    return _theme.gray('(${seconds.toStringAsFixed(1)}s)');
   }
 
   /// Clear current line
   String _clearLine() {
-    return '\u001b[2K'; // Clear entire line
+    return '\u001b[2K';
   }
 
   /// Cleanup resources
-  void _cleanup() {
-    // Additional cleanup if needed in the future
-  }
+  void _cleanup() {}
 }

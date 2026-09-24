@@ -5,8 +5,8 @@ import 'package:clix/src/core/style/theme.dart';
 import 'package:clix/src/core/formatter/basic_formatter.dart';
 import 'package:clix/src/core/indentation/indent_level.dart';
 import 'package:clix/src/core/icons/cli_icons.dart';
+import 'package:clix/src/core/icons/cli_marks.dart';
 import 'package:clix/src/core/indentation/tree_symbol.dart';
-import 'package:clix/src/core/style/point_style.dart';
 import 'package:clix/src/core/style/color.dart';
 import 'package:clix/src/core/style/padding.dart';
 import 'package:clix/src/core/style/spacing.dart';
@@ -273,7 +273,7 @@ void main() {
       test('should log message with custom mark and colors', () {
         logger.withMark(
           'Message with mark',
-          mark: CliIcons.check,
+          mark: CliMarks.check,
           markColor: CliColor.green,
           color: CliColor.white,
         );
@@ -300,7 +300,7 @@ void main() {
       });
 
       test('should log warning message with mark', () {
-        logger.warningMark('Warning with mark');
+        logger.warnMark('Warning with mark');
 
         expect(mockIO.outputs, hasLength(1));
         expect(mockIO.outputs.first, contains('△'));
@@ -344,9 +344,9 @@ void main() {
       });
 
       test('should use text symbols for info and warning marks', () {
-        expect(CliIcons.infoMark.symbol.runes.toList(), equals([0x24D8]));
+        expect(CliMarks.info.symbol.runes.toList(), equals([0x24D8]));
 
-        expect(CliIcons.warningMark.symbol.runes.toList(), equals([0x25B3]));
+        expect(CliMarks.warning.symbol.runes.toList(), equals([0x25B3]));
       });
     });
 
@@ -372,7 +372,7 @@ void main() {
       test('should log message with tree and point', () {
         logger.treePoint(
           'Tree point message',
-          style: PointStyle.bullet,
+          mark: CliMarks.bullet,
           symbol: TreeSymbol.level2,
         );
 
@@ -383,21 +383,21 @@ void main() {
 
     group('Point Style Methods', () {
       test('should log message with bullet point', () {
-        logger.point('Bullet point message', style: PointStyle.bullet);
+        logger.point('Bullet point message', mark: CliMarks.bullet);
 
         expect(mockIO.outputs, hasLength(1));
         expect(mockIO.outputs.first, contains('Bullet point message'));
       });
 
       test('should log message with arrow point', () {
-        logger.point('Arrow point message', style: PointStyle.arrow);
+        logger.point('Arrow point message', mark: CliMarks.arrow);
 
         expect(mockIO.outputs, hasLength(1));
         expect(mockIO.outputs.first, contains('Arrow point message'));
       });
 
       test('should log message with dash point', () {
-        logger.point('Dash point message', style: PointStyle.dash);
+        logger.point('Dash point message', mark: CliMarks.dash);
 
         expect(mockIO.outputs, hasLength(1));
         expect(mockIO.outputs.first, contains('Dash point message'));
@@ -727,7 +727,7 @@ void main() {
         logger.messageIconWithHint(
           'Task complete',
           hint: 'Move to next phase',
-          icon: CliIcons.check,
+          icon: CliIcons.success,
           hintSymbol: HintSymbol.lightBulb,
         );
 

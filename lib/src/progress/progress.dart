@@ -1,8 +1,8 @@
 /// Progress Bar - Visual progress tracking with customizable styles
 library;
 
+import '../core/context/cli_context.dart';
 import '../core/io/cli_io.dart';
-import '../core/io/console_io.dart';
 import '../core/style/style.dart';
 import '../core/style/theme.dart';
 import 'enums/progress_style.dart';
@@ -50,8 +50,8 @@ class Progress {
     this.width = 40,
     this.style = ProgressStyle.basic,
     CliTheme? theme,
-  }) : io = io ?? ConsoleIO(),
-       theme = theme ?? CliTheme.defaultTheme();
+  }) : io = io ?? CliContext.io,
+       theme = theme ?? CliContext.theme;
 
   void update(int current) {
     _current = current;
