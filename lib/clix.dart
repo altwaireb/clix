@@ -144,13 +144,6 @@ export 'src/progress/enums/task_status.dart';
 export 'src/table/table.dart';
 export 'src/table/enums/table_alignment.dart';
 
-/// ### **Testing Utilities**
-/// - [CliTestResult] - Test execution results and reporting
-/// - [CliTestRunner] - CLI application testing framework
-
-export 'src/testing/cli_test_result.dart';
-export 'src/testing/cli_test_runner.dart';
-
 /// ### **Command-Line Arguments**
 /// - [CliParser] - Command-line argument parser
 /// - [CliOption] - Command-line option definition

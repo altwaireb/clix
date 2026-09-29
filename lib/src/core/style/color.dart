@@ -147,22 +147,31 @@ class CliColor {
   //  PREDEFINED COLORS - Ready to use colors for all applications
   // ==========================================
 
-  /// **Primary & Secondary Colors** - Main branding and accent colors
+  /// **Primary, Secondary & Tertiary Colors** - Main branding and accent colors
   ///
   /// Professional color scheme optimized for CLI applications:
   /// - **Primary (Cyan)**: Modern, vibrant, attention-grabbing
-  /// - **Secondary (Dark Orange)**: Professional complement, warm balance
+  /// - **Secondary (Light Purple)**: Soft, elegant, and distinctive accent
+  /// - **Tertiary (Orange)**: Warm, energetic, and complementary accent
   ///
   /// ```dart
-  /// print(CliColor.primary('Main action button'));
+  /// print(CliColor.primary('Main action'));
   /// print(CliColor.secondary('Secondary information'));
+  /// print(CliColor.tertiary('Additional information'));
   /// ```
   static const primary = CliColor.rgb(0, 255, 255); // Cyan - vibrant and modern
+
   static const secondary = CliColor.rgb(
+    190,
+    100,
+    255,
+  ); // Light Purple - soft and distinctive
+
+  static const tertiary = CliColor.rgb(
     255,
     140,
     0,
-  ); // Dark Orange - professional complement
+  ); // Orange - warm and energetic
 
   /// **Basic Colors** - Standard color palette
   ///

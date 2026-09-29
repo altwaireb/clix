@@ -18,6 +18,32 @@ class HelloCommand extends CliCommand<void> {
   }
 }
 
+class LongSummaryCommand extends CliCommand<void> {
+  @override
+  String get name => 'hello';
+
+  @override
+  String get description =>
+      'This is a very long command summary that should wrap across multiple lines.';
+
+  @override
+  FutureOr<void> run() {}
+}
+
+class CategoryCommand extends CliCommand<void> {
+  @override
+  String get name => 'config';
+
+  @override
+  String get description => 'Manage project configuration.';
+
+  @override
+  String get category => 'Project';
+
+  @override
+  FutureOr<void> run() {}
+}
+
 class GreetCommand extends CliCommand<String> {
   @override
   String get name => 'greet';
@@ -223,7 +249,8 @@ void main() {
       final output = await TestUtils.captureOutput(() => runner.run([]));
 
       expect(output, contains('Clix command-line toolkit.'));
-      expect(output, contains('Usage: clix <command> [arguments]'));
+      expect(output, contains('Usage:'));
+      expect(output, contains('clix <command> [arguments]'));
     });
 
     test('throws when command is unknown', () async {
@@ -267,7 +294,8 @@ void main() {
       );
 
       expect(output, contains('Say hello.'));
-      expect(output, contains('Usage: clix hello [arguments]'));
+      expect(output, contains('Usage:'));
+      expect(output, contains('clix hello [arguments]'));
     });
 
     test('exposes usage information', () {
@@ -296,6 +324,55 @@ void main() {
       final result = await runner.run(['--name', 'Clix']);
 
       expect(result, equals('Hello, Clix!'));
+    });
+
+    test('shows the default command in usage', () {
+      final runner = CliCommandRunner<void>(
+        'clix',
+        'Clix command-line toolkit.',
+      );
+
+      runner.addCommand(HelloCommand(), isDefault: true);
+
+      expect(
+        runner.usage,
+        contains('\x1B[38;2;0;255;0m(default)\x1B[0m Say hello.'),
+      );
+    });
+
+    test('wraps a default command summary correctly', () {
+      final runner = CliCommandRunner<void>(
+        'clix',
+        'Clix command-line toolkit.',
+        usageLineLength: 40,
+      );
+
+      runner.addCommand(LongSummaryCommand(), isDefault: true);
+
+      expect(
+        runner.usage,
+        contains(
+          '  \x1B[38;2;190;100;255mhello\x1B[0m   '
+          '\x1B[38;2;0;255;0m(default)\x1B[0m This is a very long\n'
+          '          command summary that should\n'
+          '          wrap across multiple lines.',
+        ),
+      );
+    });
+
+    test('uses the provided theme for command categories', () {
+      final theme = CliTheme(tertiary: CliStyle().withColor(CliColor.red));
+      final layout = CliCommandRunnerLayout(theme: theme);
+
+      final runner = CliCommandRunner<void>(
+        'clix',
+        'Clix command-line toolkit.',
+        layout: layout,
+      );
+
+      runner.addCommand(CategoryCommand());
+
+      expect(runner.usage, contains('\x1B[38;2;255;0;0mProject\x1B[0m'));
     });
 
     test('rejects multiple default commands', () {
