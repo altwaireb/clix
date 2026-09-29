@@ -6,14 +6,18 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:math' as math;
 
-import 'cli_parser.dart';
+import '../core/context/cli_context.dart';
+import '../core/style/theme.dart';
 import 'cli_arg_parser_exception.dart';
 import 'cli_arg_results.dart';
 import 'cli_help_command.dart';
+import 'cli_parser.dart';
 import 'cli_usage_exception.dart';
 import 'cli_utils.dart';
 
 export 'cli_usage_exception.dart';
+
+part 'cli_command_runner_layout.dart';
 
 /// A class for invoking [CliCommand]s based on raw command-line arguments.
 ///
@@ -59,31 +63,18 @@ class CliCommandRunner<T> {
 
   /// Returns [usage] with [description] removed from the beginning.
   String get _usageWithoutDescription {
-    var usagePrefix = 'Usage:';
-    var buffer = StringBuffer();
-    buffer.writeln(
-      '$usagePrefix ${_wrap(invocation, hangingIndent: usagePrefix.length)}\n',
+    return _getCommandUsage(
+      _commands,
+      lineLength: argParser.usageLineLength,
+      defaultCommand: argParser.defaultCommand,
+      invocation: invocation,
+      optionsUsage: argParser.usage,
+      optionsTitle: 'Global options:',
+      footerHint:
+          'Run "$executableName help <command>" for more information about a command.',
+      usageFooter: usageFooter,
+      renderer: _layout,
     );
-    buffer.writeln(_wrap('Global options:'));
-    buffer.writeln('${argParser.usage}\n');
-    buffer.writeln(
-      _getCommandUsage(
-        _commands,
-        lineLength: argParser.usageLineLength,
-        defaultCommand: argParser.defaultCommand,
-      ),
-    );
-    buffer.writeln();
-    buffer.write(
-      _wrap(
-        'Run "$executableName help <command>" for more information about a '
-        'command.',
-      ),
-    );
-    if (usageFooter != null) {
-      buffer.write('\n${_wrap(usageFooter!)}');
-    }
-    return buffer.toString();
   }
 
   /// An unmodifiable view of all top-level commands defined for this runner.
@@ -104,12 +95,16 @@ class CliCommandRunner<T> {
   /// Set to `0` in order to disable suggestions, defaults to `2`.
   final int suggestionDistanceLimit;
 
+  final CliCommandRunnerLayout _layout;
+
   CliCommandRunner(
     this.executableName,
     this.description, {
+    CliCommandRunnerLayout? layout,
     int? usageLineLength,
     this.suggestionDistanceLimit = 2,
-  }) : _argParser = CliParser(usageLineLength: usageLineLength) {
+  }) : _layout = layout ?? CliCommandRunnerLayout(),
+       _argParser = CliParser(usageLineLength: usageLineLength) {
     argParser.addFlag(
       'help',
       abbr: 'h',
@@ -417,37 +412,17 @@ abstract class CliCommand<T> {
 
   /// Returns [usage] with [description] removed from the beginning.
   String get _usageWithoutDescription {
-    var length = argParser.usageLineLength;
-    var usagePrefix = 'Usage: ';
-    var buffer = StringBuffer()
-      ..writeln(
-        usagePrefix + _wrap(invocation, hangingIndent: usagePrefix.length),
-      )
-      ..writeln(argParser.usage);
-
-    if (_subcommands.isNotEmpty) {
-      buffer.writeln();
-      buffer.writeln(
-        _getCommandUsage(
-          _subcommands,
-          isSubcommand: true,
-          lineLength: length,
-          defaultCommand: argParser.defaultCommand,
-        ),
-      );
-    }
-
-    buffer.writeln();
-    buffer.write(
-      _wrap('Run "${runner!.executableName} help" to see global options.'),
+    return _getCommandUsage(
+      _subcommands,
+      isSubcommand: true,
+      lineLength: argParser.usageLineLength,
+      defaultCommand: argParser.defaultCommand,
+      invocation: invocation,
+      optionsUsage: argParser.usage,
+      footerHint: 'Run "${runner!.executableName} help" to see global options.',
+      usageFooter: usageFooter,
+      renderer: runner!._layout,
     );
-
-    if (usageFooter != null) {
-      buffer.writeln();
-      buffer.write(_wrap(usageFooter!));
-    }
-
-    return buffer.toString();
   }
 
   /// An unmodifiable view of all sublevel commands of this command.
@@ -553,16 +528,57 @@ abstract class CliCommand<T> {
       throw CliUsageException(_wrap(message), _usageWithoutDescription);
 }
 
-/// Returns a string representation of [commands] fit for use in a usage string.
+/// Describes the information needed to display a command in usage output.
 ///
-/// [isSubcommand] indicates whether the commands should be called "commands" or
-/// "subcommands".
+/// This model contains only presentation data and does not expose the
+/// underlying [CliCommand].
+class CliCommandInfo {
+  const CliCommandInfo({required this.name, required this.summary});
+
+  final String name;
+  final String summary;
+}
+
+// Represents the presentation data for a single command usage line,
+// including its summary and whether it is the default command.
+class _CommandUsageLine {
+  const _CommandUsageLine({required this.summary, this.isDefault = false});
+
+  final String summary;
+  final bool isDefault;
+}
+
+/// Groups commands under a category for usage output.
 ///
-/// [defaultCommand] indicate which command (if any) is designated as default.
-String _getCommandUsage(
+/// An empty [name] represents commands that do not belong to a named category.
+class CliCommandCategory {
+  const CliCommandCategory({required this.name, required this.commands});
+
+  final String name;
+  final List<CliCommandInfo> commands;
+}
+
+/// Contains the structured data required to render command usage.
+///
+/// [CliCommandRunner] builds this data from its registered commands and
+/// [CliCommandRunnerLayout] is responsible for rendering it.
+class CliCommandUsageData {
+  const CliCommandUsageData({
+    required this.categories,
+    required this.defaultCommand,
+  });
+
+  final List<CliCommandCategory> categories;
+  final String? defaultCommand;
+}
+
+// Builds the structured usage data consumed by CliCommandRunnerLayout.
+//
+// This method filters aliases and hidden commands, groups commands by
+// category, and converts commands into presentation data without applying
+// any formatting or styling.
+CliCommandUsageData _buildCommandUsageData(
   Map<String, CliCommand> commands, {
-  bool isSubcommand = false,
-  int? lineLength,
   String? defaultCommand,
 }) {
   // Don't include aliases.
@@ -574,7 +590,7 @@ String _getCommandUsage(
   var visible = names.where((name) => !commands[name]!.hidden);
   if (visible.isNotEmpty) names = visible;
 
-  // Show names in the order they were first added
+  // Show names in the order they were first added.
   names = names.toList();
 
   // Group the commands by category.
@@ -583,49 +599,57 @@ String _getCommandUsage(
     var category = commands[name]!.category;
     commandsByCategory.putIfAbsent(category, () => []).add(commands[name]!);
   }
-  final categories = commandsByCategory.keys.toList();
 
-  var length = names.map((name) => name.length).reduce(math.max);
+  final categories = commandsByCategory.entries
+      .map(
+        (entry) => CliCommandCategory(
+          name: entry.key,
+          commands: entry.value
+              .map(
+                (command) => CliCommandInfo(
+                  name: command.name,
+                  summary: command.summary,
+                ),
+              )
+              .toList(),
+        ),
+      )
+      .toList();
 
-  var buffer = StringBuffer('Available ${isSubcommand ? "sub" : ""}commands:');
-  var columnStart = length + 5;
-  for (var category in categories) {
-    if (category != '') {
-      buffer.writeln();
-      buffer.writeln();
-      buffer.write(category);
-    }
-    for (var command in commandsByCategory[category]!) {
-      var defaultMarker = defaultCommand == command.name ? '(default) ' : '';
-      var lines = wrapTextAsLines(
-        defaultMarker + command.summary,
-        start: columnStart,
-        length: lineLength,
-      );
-      buffer.writeln();
-      buffer.write('  ${padRight(command.name, length)}   ${lines.first}');
+  return CliCommandUsageData(
+    categories: categories,
+    defaultCommand: defaultCommand,
+  );
+}
 
-      for (var line in lines.skip(1)) {
-        buffer.writeln();
-        buffer.write(' ' * columnStart);
-        buffer.write(line);
-      }
-    }
-  }
+// Builds command usage data and delegates all usage presentation to the
+// provided CliCommandRunnerLayout.
+//
+// This method intentionally keeps formatting and styling out of the runner.
+String _getCommandUsage(
+  Map<String, CliCommand> commands, {
+  bool isSubcommand = false,
+  int? lineLength,
+  String? defaultCommand,
+  String? invocation,
+  String? optionsUsage,
+  String? optionsTitle,
+  String? footerHint,
+  String? usageFooter,
+  required CliCommandRunnerLayout renderer,
+}) {
+  final data = _buildCommandUsageData(commands, defaultCommand: defaultCommand);
 
-  if (defaultCommand != null) {
-    buffer.writeln();
-    buffer.writeln();
-    buffer.write(
-      wrapText(
-        'Default command ($defaultCommand) will be selected if no command'
-        ' is explicitly specified.',
-        length: lineLength,
-      ),
-    );
-  }
-
-  return buffer.toString();
+  return renderer.renderUsage(
+    data,
+    isSubcommand: isSubcommand,
+    invocation: invocation,
+    optionsUsage: optionsUsage,
+    optionsTitle: optionsTitle,
+    footerHint: footerHint,
+    usageFooter: usageFooter,
+    lineLength: lineLength,
+  );
 }
 
 /// Returns the edit distance between `from` and `to`.

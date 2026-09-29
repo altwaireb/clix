@@ -10,6 +10,7 @@ class CliTheme {
   final CliStyle success;
   final CliStyle primary; // Primary color
   final CliStyle secondary; // Secondary color
+  final CliStyle tertiary; // Tertiary color
   final CliStyle gray;
 
   CliTheme({
@@ -21,6 +22,7 @@ class CliTheme {
     CliStyle? success,
     CliStyle? primary,
     CliStyle? secondary,
+    CliStyle? tertiary,
     CliStyle? gray,
   }) : plain = plain ?? CliStyle().withColor(CliColor.white),
        debug = debug ?? CliStyle().withColor(CliColor.gray),
@@ -30,6 +32,7 @@ class CliTheme {
        success = success ?? CliStyle().withColor(CliColor.green),
        primary = primary ?? CliStyle().withColor(CliColor.primary),
        secondary = secondary ?? CliStyle().withColor(CliColor.secondary),
+       tertiary = tertiary ?? CliStyle().withColor(CliColor.tertiary),
        gray = gray ?? CliStyle().withColor(CliColor.gray);
 
   factory CliTheme.defaultTheme() {
@@ -42,6 +45,7 @@ class CliTheme {
       success: CliStyle().withColor(CliColor.green),
       primary: CliStyle().withColor(CliColor.primary),
       secondary: CliStyle().withColor(CliColor.secondary),
+      tertiary: CliStyle().withColor(CliColor.tertiary),
       gray: CliStyle().withColor(CliColor.gray),
     );
   }
