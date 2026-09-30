@@ -73,6 +73,12 @@ void main() {
       expect(terminal.output.output, isEmpty);
     });
 
+    test('moves cursor to the beginning of the current line', () {
+      CliTerminalControl.moveToLineStart();
+
+      expect(terminal.output.output, '\r');
+    });
+
     test('clears the current line', () {
       CliTerminalControl.clearLine();
 

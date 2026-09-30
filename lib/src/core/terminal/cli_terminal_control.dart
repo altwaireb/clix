@@ -35,6 +35,11 @@ abstract final class CliTerminalControl {
     CliTerminalContext.output.write('\x1B[${lines}B');
   }
 
+  /// Moves the cursor to the beginning of the current line.
+  static void moveToLineStart() {
+    CliTerminalContext.output.write('\r');
+  }
+
   /// Clears the current terminal line.
   static void clearLine() {
     CliTerminalContext.output.write('\x1B[2K');

@@ -90,6 +90,7 @@ class Select extends Prompt<int> {
       final lines = _renderedLines(confirmed: false);
 
       CliTerminalControl.moveUp(lines);
+      CliTerminalControl.moveToLineStart();
       CliTerminalControl.clearLines(lines);
     }
 

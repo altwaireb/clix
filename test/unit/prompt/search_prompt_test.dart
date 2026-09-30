@@ -439,7 +439,7 @@ void main() {
       final keyboard = _createKeyboard([const CliKey.enter()]);
 
       final search = Search(
-        prompt: 'Choose framework: ',
+        prompt: 'Choose framework:',
         options: ['flutter'],
         keyboard: keyboard,
       );
@@ -448,7 +448,10 @@ void main() {
 
       await search.run(mockIO, theme);
 
-      expect(mockIO.outputs.first, equals(theme.primary('Choose framework: ')));
+      expect(
+        mockIO.outputs.first,
+        equals('\x1B[38;2;0;255;255mChoose framework:\x1B[0m '),
+      );
     });
 
     test('should handle no results and allow another search', () async {

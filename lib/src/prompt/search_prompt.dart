@@ -75,8 +75,7 @@ class Search extends Prompt<int> {
   }
 
   Future<String> _getSearchQuery(CliIO io, CliTheme theme) async {
-    // Simple prompt like Input.
-    io.write(theme.primary(prompt));
+    io.write('${theme.primary(prompt)} ');
 
     final query = io.readLine().trim();
 
@@ -145,6 +144,15 @@ class Search extends Prompt<int> {
 
           _renderSearchOptions(io, theme, results, selectedIndex, redraw: true);
         } else if (key.isEnter) {
+          _renderSearchOptions(
+            io,
+            theme,
+            results,
+            selectedIndex,
+            confirmed: true,
+            redraw: true,
+          );
+
           return selectedIndex;
         } else if (key.isTab) {
           return -1;
@@ -164,9 +172,11 @@ class Search extends Prompt<int> {
     bool confirmed = false,
   }) {
     if (redraw) {
-      final linesToMove = help ? results.length + 2 : results.length;
+      final lines = _renderedLines(results, confirmed: confirmed);
 
-      CliTerminalControl.moveUp(linesToMove);
+      CliTerminalControl.moveUp(lines);
+      CliTerminalControl.moveToLineStart();
+      CliTerminalControl.clearLines(lines);
     }
 
     if (!confirmed && _shouldRenderHelpAtTop) {
@@ -191,11 +201,7 @@ class Search extends Prompt<int> {
         } else {
           io.writeln('    ${theme.gray(option)}');
         }
-
-        continue;
-      }
-
-      if (isSelected) {
+      } else if (isSelected) {
         final mark = theme.primary(CliMarks.pointer.symbol);
         final text = theme.primary(option);
 
@@ -205,16 +211,20 @@ class Search extends Prompt<int> {
       }
     }
 
-    if (confirmed) {
-      return;
-    }
-
-    if (_shouldRenderHelpAtBottom) {
+    if (!confirmed && _shouldRenderHelpAtBottom) {
       CliTerminalControl.clearLine();
       io.writeln('');
 
       _renderHelp(io, theme);
     }
+  }
+
+  int _renderedLines(List<String> results, {required bool confirmed}) {
+    if (confirmed || !help) {
+      return results.length;
+    }
+
+    return results.length + 2;
   }
 
   void _renderHelp(CliIO io, CliTheme theme) {

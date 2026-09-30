@@ -13,7 +13,7 @@ class ConsoleIO implements CliIO {
   void write(String text) => stdout.write(text);
 
   @override
-  void writeln([String text = '']) => stdout.writeln(text);
+  void writeln([String text = '']) => stdout.write('$text\r\n');
 
   @override
   String readLine() => stdin.readLineSync() ?? '';

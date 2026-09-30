@@ -13,5 +13,6 @@ Future<void> main() async {
       'Go',
       'Swift',
     ],
+    helpPosition: CliHelpPromptPosition.top,
   ).interact();
 }
