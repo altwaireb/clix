@@ -46,7 +46,7 @@ class Search extends Prompt<int> {
       }
 
       // Phase 4: Show results with Select-style interface
-      final selectedIndex = await _showSelectResults(io, theme, results);
+      final selectedIndex = await _showSelectResults(io, theme, query, results);
 
       if (selectedIndex == -1) {
         // User chose to search again.
@@ -65,12 +65,8 @@ class Search extends Prompt<int> {
         }
       }
 
-      // Show confirmation and return original index
-      final originalIndex = _findOriginalIndex(selectedValue, results);
-
-      _showConfirmation(io, theme, selectedValue, results.length);
-
-      return originalIndex;
+      // Return the original index after the selection has been confirmed.
+      return _findOriginalIndex(selectedValue, results);
     }
   }
 
@@ -120,6 +116,7 @@ class Search extends Prompt<int> {
   Future<int> _showSelectResults(
     CliIO io,
     CliTheme theme,
+    String query,
     List<String> results,
   ) async {
     var selectedIndex = defaultIndex != null && defaultIndex! < results.length
@@ -127,7 +124,7 @@ class Search extends Prompt<int> {
         : 0;
 
     // Show initial options directly below the search query.
-    _renderSearchOptions(io, theme, results, selectedIndex, redraw: false);
+    _renderSearchOptions(io, theme, query, results, selectedIndex);
 
     keyboard.start();
 
@@ -138,15 +135,30 @@ class Search extends Prompt<int> {
         if (key.isArrowUp) {
           selectedIndex = (selectedIndex - 1 + results.length) % results.length;
 
-          _renderSearchOptions(io, theme, results, selectedIndex, redraw: true);
+          _renderSearchOptions(
+            io,
+            theme,
+            query,
+            results,
+            selectedIndex,
+            redraw: true,
+          );
         } else if (key.isArrowDown) {
           selectedIndex = (selectedIndex + 1) % results.length;
 
-          _renderSearchOptions(io, theme, results, selectedIndex, redraw: true);
+          _renderSearchOptions(
+            io,
+            theme,
+            query,
+            results,
+            selectedIndex,
+            redraw: true,
+          );
         } else if (key.isEnter) {
           _renderSearchOptions(
             io,
             theme,
+            query,
             results,
             selectedIndex,
             confirmed: true,
@@ -166,20 +178,34 @@ class Search extends Prompt<int> {
   void _renderSearchOptions(
     CliIO io,
     CliTheme theme,
+    String query,
     List<String> results,
     int selectedIndex, {
     bool redraw = false,
     bool confirmed = false,
   }) {
     if (redraw) {
-      final lines = _renderedLines(results, confirmed: confirmed);
+      final previousLines = _renderedLines(results, confirmed: false);
+      final lines = confirmed ? previousLines + 1 : previousLines;
 
       CliTerminalControl.moveUp(lines);
       CliTerminalControl.moveToLineStart();
       CliTerminalControl.clearLines(lines);
     }
 
-    if (!confirmed && _shouldRenderHelpAtTop) {
+    if (confirmed) {
+      CliTerminalControl.clearLine();
+      io.writeln('${theme.primary(prompt)} ${theme.gray(query)}');
+
+      final mark = theme.success(CliMarks.check.symbol);
+      final text = theme.primary(results[selectedIndex]);
+
+      CliTerminalControl.clearLine();
+      io.writeln('  $mark $text');
+      return;
+    }
+
+    if (_shouldRenderHelpAtTop) {
       _renderHelp(io, theme);
 
       CliTerminalControl.clearLine();
@@ -192,16 +218,7 @@ class Search extends Prompt<int> {
       final isSelected = i == selectedIndex;
       final option = results[i];
 
-      if (confirmed) {
-        if (isSelected) {
-          final mark = theme.success(CliMarks.check.symbol);
-          final text = theme.primary(option);
-
-          io.writeln('  $mark $text');
-        } else {
-          io.writeln('    ${theme.gray(option)}');
-        }
-      } else if (isSelected) {
+      if (isSelected) {
         final mark = theme.primary(CliMarks.pointer.symbol);
         final text = theme.primary(option);
 
@@ -211,7 +228,7 @@ class Search extends Prompt<int> {
       }
     }
 
-    if (!confirmed && _shouldRenderHelpAtBottom) {
+    if (_shouldRenderHelpAtBottom) {
       CliTerminalControl.clearLine();
       io.writeln('');
 
@@ -300,37 +317,5 @@ class Search extends Prompt<int> {
 
     // For dynamic searches, return the index from search results.
     return searchResults.indexOf(selectedValue);
-  }
-
-  void _showConfirmation(
-    CliIO io,
-    CliTheme theme,
-    String result, [
-    int? resultsCount,
-  ]) {
-    if (resultsCount != null && resultsCount > 1) {
-      final linesToMove = resultsCount + (help ? 3 : 2);
-
-      CliTerminalControl.moveUp(linesToMove);
-
-      for (var i = 0; i < linesToMove; i++) {
-        CliTerminalControl.clearLine();
-
-        if (i < linesToMove - 1) {
-          CliTerminalControl.moveDown();
-        }
-      }
-
-      CliTerminalControl.moveUp(linesToMove - 1);
-    } else {
-      CliTerminalControl.moveUp();
-      CliTerminalControl.clearLine();
-    }
-
-    final checkmark = theme.success(CliMarks.check.symbol);
-    final question = theme.primary(prompt);
-    final answer = theme.plain(result);
-
-    io.writeln('$checkmark $question $answer');
   }
 }
